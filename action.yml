@@ -1,0 +1,13 @@
+name: Set up cljstyle
+description: Install cljstyle
+author: Kodai Matsumoto
+branding:
+  icon: check
+  color: green
+inputs:
+  cljstyle-version:
+    description: Version of cljstyle
+    default: 0.13.0
+runs:
+  using: node12
+  main: dist/setup-cljstyle.js

@@ -2,7 +2,8 @@ import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
 import * as os from 'os';
 import * as process from 'process';
-import { absolute, relative, joinPath } from './path';
+
+import { absolute, joinPath, relative } from './path';
 
 const version = core.getInput('cljstyle-version');
 

@@ -694,7 +694,7 @@ var require_io = __commonJS((exports) => {
   }
 });
 
-// node_modules/semver/semver.js
+// node_modules/@actions/tool-cache/node_modules/semver/semver.js
 var require_semver = __commonJS((exports, module2) => {
   exports = module2.exports = SemVer;
   var debug;

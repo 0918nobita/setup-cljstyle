@@ -238,11 +238,11 @@ var require_core = __commonJS((exports) => {
     command_1.issue("echo", enabled ? "on" : "off");
   }
   exports.setCommandEcho = setCommandEcho;
-  function setFailed(message) {
+  function setFailed2(message) {
     process.exitCode = ExitCode.Failure;
     error(message);
   }
-  exports.setFailed = setFailed;
+  exports.setFailed = setFailed2;
   function isDebug() {
     return process.env["RUNNER_DEBUG"] === "1";
   }
@@ -3847,6 +3847,7 @@ var require_tool_cache = __commonJS((exports) => {
 const core = __toModule(require_core());
 const tc = __toModule(require_tool_cache());
 const os = __toModule(require("os"));
+const process2 = __toModule(require("process"));
 
 // src/path.ts
 const path = __toModule(require("path"));
@@ -3856,6 +3857,11 @@ const joinPath = (base, relativePath) => path.join(base, relativePath);
 
 // src/setup-cljstyle.ts
 const version = core.getInput("cljstyle-version");
+const versionPattern = /^([1-9]\d*|0)\.([1-9]\d*|0)\.([1-9]\d*|0)$/;
+if (!versionPattern.test(version)) {
+  core.setFailed("The format of cljstyle-version is invalid.");
+  process2.exit(1);
+}
 const homeDir = absolute(os.homedir());
 const binDir = joinPath(homeDir, relative("bin"));
 const tarName = relative(`cljstyle_${version}_linux.tar.gz`);

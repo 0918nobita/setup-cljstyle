@@ -21,33 +21,40 @@ const tarName = relative(`cljstyle_${version}_linux.tar.gz`);
 
 const url = `http://github.com/greglook/cljstyle/releases/download/${version}/${tarName}`;
 
+const error = (msg: string, err: Error) => {
+    core.setFailed(msg);
+    console.error(err);
+    process.exit(1);
+};
+
+const addPath = (inputPath: string) => {
+    core.info(`Add ${inputPath} into PATH`);
+    core.addPath(inputPath);
+};
+
 (async () => {
     const cachePath = tc.find('cljstyle', version);
-    if (cachePath !== '') return;
+    if (cachePath !== '') {
+        addPath(cachePath);
+        return;
+    }
 
     core.info(`Downloading ${url}`);
-    const tarPath = await tc.downloadTool(url).catch((err) => {
-        core.setFailed('Failed to download tar file');
-        console.error(err);
-        process.exit(1);
-    });
+    const tarPath = await tc
+        .downloadTool(url)
+        .catch((err) => error('Failed to download tar file', err));
 
     core.info(`Extracting ${tarPath} into ${binDir}`);
     const extractedDir = await tc
         .extractTar(tarPath, joinPath(binDir, relative('cljstyle')))
-        .catch((err) => {
-            core.setFailed('Failed to download tar file');
-            console.error(err);
-            process.exit(1);
-        });
+        .catch((err) => error('Failed to extract tar file', err));
 
     core.info(`Caching ${extractedDir} directory`);
-    await tc.cacheDir(extractedDir, 'cljstyle', version).catch((err) => {
-        core.setFailed(`Failed to cache ${extractedDir} directory`);
-        console.error(err);
-        process.exit(1);
-    });
+    await tc
+        .cacheDir(extractedDir, 'cljstyle', version)
+        .catch((err) =>
+            error(`Failed to cache ${extractedDir} directory`, err)
+        );
 
-    core.info(`Add ${extractedDir} to PATH`);
-    core.addPath(extractedDir);
+    addPath(extractedDir);
 })();

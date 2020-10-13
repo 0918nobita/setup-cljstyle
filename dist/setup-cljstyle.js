@@ -212,7 +212,7 @@ var require_core = __commonJS((exports) => {
     command_1.issueCommand("add-mask", {}, secret);
   }
   exports.setSecret = setSecret;
-  function addPath2(inputPath) {
+  function addPath3(inputPath) {
     const filePath = process.env["GITHUB_PATH"] || "";
     if (filePath) {
       file_command_1.issueCommand("PATH", inputPath);
@@ -221,7 +221,7 @@ var require_core = __commonJS((exports) => {
     }
     process.env["PATH"] = `${inputPath}${path3.delimiter}${process.env["PATH"]}`;
   }
-  exports.addPath = addPath2;
+  exports.addPath = addPath3;
   function getInput2(name, options) {
     const val = process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
     if (options && options.required && !val) {
@@ -240,7 +240,7 @@ var require_core = __commonJS((exports) => {
   exports.setCommandEcho = setCommandEcho;
   function setFailed2(message) {
     process.exitCode = ExitCode.Failure;
-    error(message);
+    error2(message);
   }
   exports.setFailed = setFailed2;
   function isDebug() {
@@ -251,10 +251,10 @@ var require_core = __commonJS((exports) => {
     command_1.issueCommand("debug", {}, message);
   }
   exports.debug = debug;
-  function error(message) {
+  function error2(message) {
     command_1.issue("error", message instanceof Error ? message.toString() : message);
   }
-  exports.error = error;
+  exports.error = error2;
   function warning(message) {
     command_1.issue("warning", message instanceof Error ? message.toString() : message);
   }
@@ -2113,18 +2113,18 @@ var require_tunnel = __commonJS((exports) => {
       if (res.statusCode !== 200) {
         debug("tunneling socket could not be established, statusCode=%d", res.statusCode);
         socket.destroy();
-        var error = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
-        error.code = "ECONNRESET";
-        options.request.emit("error", error);
+        var error2 = new Error("tunneling socket could not be established, statusCode=" + res.statusCode);
+        error2.code = "ECONNRESET";
+        options.request.emit("error", error2);
         self.removeSocket(placeholder);
         return;
       }
       if (head.length > 0) {
         debug("got illegal response body from proxy");
         socket.destroy();
-        var error = new Error("got illegal response body from proxy");
-        error.code = "ECONNRESET";
-        options.request.emit("error", error);
+        var error2 = new Error("got illegal response body from proxy");
+        error2.code = "ECONNRESET";
+        options.request.emit("error", error2);
         self.removeSocket(placeholder);
         return;
       }
@@ -2135,9 +2135,9 @@ var require_tunnel = __commonJS((exports) => {
     function onError(cause) {
       connectReq.removeAllListeners();
       debug("tunneling socket could not be established, cause=%s\n", cause.message, cause.stack);
-      var error = new Error("tunneling socket could not be established, cause=" + cause.message);
-      error.code = "ECONNRESET";
-      options.request.emit("error", error);
+      var error2 = new Error("tunneling socket could not be established, cause=" + cause.message);
+      error2.code = "ECONNRESET";
+      options.request.emit("error", error2);
       self.removeSocket(placeholder);
     }
   };
@@ -3064,7 +3064,7 @@ var require_toolrunner = __commonJS((exports) => {
             this._debug(`STDIO streams have closed for tool '${this.toolPath}'`);
             state.CheckComplete();
           });
-          state.on("done", (error, exitCode) => {
+          state.on("done", (error2, exitCode) => {
             if (stdbuffer.length > 0) {
               this.emit("stdline", stdbuffer);
             }
@@ -3072,8 +3072,8 @@ var require_toolrunner = __commonJS((exports) => {
               this.emit("errline", errbuffer);
             }
             cp.removeAllListeners();
-            if (error) {
-              reject(error);
+            if (error2) {
+              reject(error2);
             } else {
               resolve(exitCode);
             }
@@ -3168,14 +3168,14 @@ var require_toolrunner = __commonJS((exports) => {
       this.emit("debug", message);
     }
     _setResult() {
-      let error;
+      let error2;
       if (this.processExited) {
         if (this.processError) {
-          error = new Error(`There was an error when attempting to execute the process '${this.toolPath}'. This may indicate the process failed to start. Error: ${this.processError}`);
+          error2 = new Error(`There was an error when attempting to execute the process '${this.toolPath}'. This may indicate the process failed to start. Error: ${this.processError}`);
         } else if (this.processExitCode !== 0 && !this.options.ignoreReturnCode) {
-          error = new Error(`The process '${this.toolPath}' failed with exit code ${this.processExitCode}`);
+          error2 = new Error(`The process '${this.toolPath}' failed with exit code ${this.processExitCode}`);
         } else if (this.processStderr && this.options.failOnStdErr) {
-          error = new Error(`The process '${this.toolPath}' failed because one or more lines were written to the STDERR stream`);
+          error2 = new Error(`The process '${this.toolPath}' failed because one or more lines were written to the STDERR stream`);
         }
       }
       if (this.timeout) {
@@ -3183,7 +3183,7 @@ var require_toolrunner = __commonJS((exports) => {
         this.timeout = null;
       }
       this.done = true;
-      this.emit("done", error, this.processExitCode);
+      this.emit("done", error2, this.processExitCode);
     }
     static HandleTimeout(state) {
       if (state.done) {
@@ -3866,28 +3866,26 @@ const homeDir = absolute(os.homedir());
 const binDir = joinPath(homeDir, relative("bin"));
 const tarName = relative(`cljstyle_${version}_linux.tar.gz`);
 const url = `http://github.com/greglook/cljstyle/releases/download/${version}/${tarName}`;
+const error = (msg, err) => {
+  core.setFailed(msg);
+  console.error(err);
+  process2.exit(1);
+};
+const addPath2 = (inputPath) => {
+  core.info(`Add ${inputPath} into PATH`);
+  core.addPath(inputPath);
+};
 (async () => {
   const cachePath = tc.find("cljstyle", version);
-  if (cachePath !== "")
+  if (cachePath !== "") {
+    addPath2(cachePath);
     return;
+  }
   core.info(`Downloading ${url}`);
-  const tarPath = await tc.downloadTool(url).catch((err) => {
-    core.setFailed("Failed to download tar file");
-    console.error(err);
-    process2.exit(1);
-  });
+  const tarPath = await tc.downloadTool(url).catch((err) => error("Failed to download tar file", err));
   core.info(`Extracting ${tarPath} into ${binDir}`);
-  const extractedDir = await tc.extractTar(tarPath, joinPath(binDir, relative("cljstyle"))).catch((err) => {
-    core.setFailed("Failed to download tar file");
-    console.error(err);
-    process2.exit(1);
-  });
+  const extractedDir = await tc.extractTar(tarPath, joinPath(binDir, relative("cljstyle"))).catch((err) => error("Failed to extract tar file", err));
   core.info(`Caching ${extractedDir} directory`);
-  await tc.cacheDir(extractedDir, "cljstyle", version).catch((err) => {
-    core.setFailed(`Failed to cache ${extractedDir} directory`);
-    console.error(err);
-    process2.exit(1);
-  });
-  core.info(`Add ${extractedDir} to PATH`);
-  core.addPath(extractedDir);
+  await tc.cacheDir(extractedDir, "cljstyle", version).catch((err) => error(`Failed to cache ${extractedDir} directory`, err));
+  addPath2(extractedDir);
 })();

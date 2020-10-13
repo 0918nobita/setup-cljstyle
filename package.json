@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint './**/*.ts'",
+    "format": "eslint --fix './**/*.ts'",
     "typecheck": "tsc",
     "build": "esbuild src/setup-cljstyle.ts --bundle --outdir=dist --target=node12 --platform=node",
     "git-add": "git add dist/setup-cljstyle.js"

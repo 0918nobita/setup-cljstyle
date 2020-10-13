@@ -10,5 +10,4 @@ jobs:
       - uses: ./
         with:
           cljstyle-version: 0.13.0
-      - run: ls -la
       - run: cljstyle version

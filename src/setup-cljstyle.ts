@@ -22,7 +22,21 @@ const tarName = relative(`cljstyle_${version}_linux.tar.gz`);
 const url = `http://github.com/greglook/cljstyle/releases/download/${version}/${tarName}`;
 
 (async () => {
+    const cachePath = tc.find('cljstyle', version);
+    if (cachePath !== '') return;
+
+    core.info(`Downloading ${url}`);
     const tarPath = await tc.downloadTool(url);
-    await tc.extractTar(tarPath, binDir);
-    core.addPath(binDir);
+
+    core.info(`Extracting ${tarPath} into ${binDir}`);
+    const extractedDir = await tc.extractTar(
+        tarPath,
+        joinPath(binDir, relative('cljstyle'))
+    );
+
+    core.info(`Caching ${extractedDir} directory`);
+    await tc.cacheDir(extractedDir, 'cljstyle', version);
+
+    core.info(`Add ${extractedDir} to PATH`);
+    core.addPath(extractedDir);
 })();

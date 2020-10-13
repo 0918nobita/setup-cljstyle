@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@actions/core@^1.2.3", "@actions/core@^1.2.6":
+"@actions/core@1.2.6", "@actions/core@^1.2.3":
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/@actions/core/-/core-1.2.6.tgz#a78d49f41a4def18e88ce47c2cac615d5694bf09"
   integrity sha512-ZQYitnqiyBc3D+k7LsgSBmMDVkOVidaagDG7j3fOym77jNunWRuYx7VSHa9GNfFZh+zh61xsCjRj4JxMZlDqTA==
@@ -26,7 +26,7 @@
   resolved "https://registry.yarnpkg.com/@actions/io/-/io-1.0.2.tgz#2f614b6e69ce14d191180451eb38e6576a6e6b27"
   integrity sha512-J8KuFqVPr3p6U8W93DOXlXW6zFvrQAJANdS+vw0YhusLIq+bszW8zmK2Fh1C2kDPX8FMvwIl1OUcFgvJoXLbAg==
 
-"@actions/tool-cache@^1.6.0":
+"@actions/tool-cache@1.6.0":
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/@actions/tool-cache/-/tool-cache-1.6.0.tgz#5b425db2d642df65dd0d6bcec0d84dcdbca3f80d"
   integrity sha512-+fyEBImPD3m5I0o6DflCO0NHY180LPoX8Lo6y4Iez+V17kO8kfkH0VHxb8mUdmD6hn9dWA9Ch1JA20fXoIYUeQ==
@@ -38,12 +38,12 @@
     semver "^6.1.0"
     uuid "^3.3.2"
 
-"@types/node@^14.11.8":
+"@types/node@14.11.8":
   version "14.11.8"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.11.8.tgz#fe2012f2355e4ce08bca44aeb3abbb21cf88d33f"
   integrity sha512-KPcKqKm5UKDkaYPTuXSx8wEP7vE9GnuaXIZKijwRYcePpZFDVuy2a57LarFKiORbHOuTOOwYzxVxcUzsh2P2Pw==
 
-esbuild@^0.7.14:
+esbuild@0.7.14:
   version "0.7.14"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.7.14.tgz#9de555e75669187c2315317fbf489b229b1a4cbb"
   integrity sha512-w2CEVeRcUhCGYMHnNNwb8q+9w42scL7RcNzJm85gZVzNBE3AF0sLq5YP/IdaTBJIFBphIKG3bGbwRH+zsgH/ig==
@@ -58,7 +58,7 @@ tunnel@0.0.6:
   resolved "https://registry.yarnpkg.com/tunnel/-/tunnel-0.0.6.tgz#72f1314b34a5b192db012324df2cc587ca47f92c"
   integrity sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==
 
-typescript@^4.0.3:
+typescript@4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.3.tgz#153bbd468ef07725c1df9c77e8b453f8d36abba5"
   integrity sha512-tEu6DGxGgRJPb/mVPIZ48e69xCn2yRmCgYmDugAVwmJ6o+0u1RI18eO7E7WBTLYLaEVVOhwQmcdhQHweux/WPg==

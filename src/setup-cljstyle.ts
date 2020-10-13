@@ -26,16 +26,27 @@ const url = `http://github.com/greglook/cljstyle/releases/download/${version}/${
     if (cachePath !== '') return;
 
     core.info(`Downloading ${url}`);
-    const tarPath = await tc.downloadTool(url);
+    const tarPath = await tc.downloadTool(url).catch((err) => {
+        core.setFailed('Failed to download tar file');
+        console.error(err);
+        process.exit(1);
+    });
 
     core.info(`Extracting ${tarPath} into ${binDir}`);
-    const extractedDir = await tc.extractTar(
-        tarPath,
-        joinPath(binDir, relative('cljstyle'))
-    );
+    const extractedDir = await tc
+        .extractTar(tarPath, joinPath(binDir, relative('cljstyle')))
+        .catch((err) => {
+            core.setFailed('Failed to download tar file');
+            console.error(err);
+            process.exit(1);
+        });
 
     core.info(`Caching ${extractedDir} directory`);
-    await tc.cacheDir(extractedDir, 'cljstyle', version);
+    await tc.cacheDir(extractedDir, 'cljstyle', version).catch((err) => {
+        core.setFailed(`Failed to cache ${extractedDir} directory`);
+        console.error(err);
+        process.exit(1);
+    });
 
     core.info(`Add ${extractedDir} to PATH`);
     core.addPath(extractedDir);

@@ -3,6 +3,15 @@ name: Test
 on: push
 
 jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          cljstyle-version: 0.13.0
+      - run: cljstyle version
+
   macOS:
     runs-on: macos-latest
     steps:

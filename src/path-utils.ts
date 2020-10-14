@@ -2,7 +2,7 @@ import * as path from 'path';
 
 import { Branded, WithoutBrand } from './branded-types';
 
-type Path<T extends 'absolute' | 'relative'> = Branded<string, T>;
+export type Path<T extends 'absolute' | 'relative'> = Branded<string, T>;
 
 export const absolute = <T extends string>(
     path: WithoutBrand<T>

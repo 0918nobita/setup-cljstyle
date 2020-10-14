@@ -10,7 +10,7 @@
     "lint": "eslint './**/*.ts'",
     "format": "eslint --fix './**/*.ts'",
     "typecheck": "tsc",
-    "build": "esbuild src/index.ts --outfile=dist/setup-cljstyle.js --minify --bundle --target=node12 --platform=node",
+    "build": "ts-node scripts/build.ts",
     "git-add": "git add dist/setup-cljstyle.js"
   },
   "pre-commit": [
@@ -32,6 +32,7 @@
     "eslint-plugin-simple-import-sort": "^5.0.3",
     "pre-commit": "^1.2.2",
     "prettier": "^2.1.2",
+    "ts-node": "^9.0.0",
     "typescript": "4.0.3"
   }
 }

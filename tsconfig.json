@@ -13,6 +13,7 @@
     "noFallthroughCasesInSwitch": true,
   },
   "include": [
-    "src"
+    "src",
+    "scripts"
   ]
 }

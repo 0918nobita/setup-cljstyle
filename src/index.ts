@@ -21,7 +21,7 @@ if (cachePath !== '') {
 
 switch (process.platform) {
     case 'win32':
-        setupOnWindows();
+        setupOnWindows({ version });
         break;
     case 'darwin':
         setupOnMacOS({ version });

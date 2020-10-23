@@ -399,10 +399,10 @@ enquirer@^2.3.5:
   dependencies:
     ansi-colors "^4.1.1"
 
-esbuild@0.7.17:
-  version "0.7.17"
-  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.7.17.tgz#38b180f7c160e8a1b7f396a8d7a299e8f5df7325"
-  integrity sha512-5lO1NBOekZYU8h55SJJUc2dMe8duAwIqOQrIIvawRwbBRoWCmLSsMJmEvdFDITt24pkhu8AN4IKfyflLgaKxbg==
+esbuild@0.7.19:
+  version "0.7.19"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.7.19.tgz#6f8b94445e06f8bf6125183a877de6046c965abc"
+  integrity sha512-0Ur8ZtuRPwJMj4+VjRLqn5z88WXf+2etZhe4dBA6eYFcdviQefb+Vrd59cTk0VXg08NU/BnAMkalCMHI8lig/A==
 
 escape-string-regexp@^1.0.5:
   version "1.0.5"

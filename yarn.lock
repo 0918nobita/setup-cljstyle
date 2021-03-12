@@ -408,10 +408,10 @@ enquirer@^2.3.5:
   dependencies:
     ansi-colors "^4.1.1"
 
-esbuild@0.8.56:
-  version "0.8.56"
-  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.8.56.tgz#9c7c3d6e614db7367afa348adb0ab287c296735e"
-  integrity sha512-PTMdAWK3JI2MNW811znGssGP5GR44tQPr++VQ1rPP0n8Z1cTKbCPD3S/kXPLr3ZZDIwAaVm08fuFym6Rp8l/0A==
+esbuild@0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.9.1.tgz#539b4741d5da95e4dd9d27cd5b290104d7d62f9b"
+  integrity sha512-2A0lJxpkV9tvwz+tCD6Ww1bvbZKvH4zBz8G8Dx/MhLwmJ23p8XRIz44ObWt8dpDpZARzhiahacQ+b/V1GJbx0A==
 
 escape-string-regexp@^1.0.5:
   version "1.0.5"

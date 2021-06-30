@@ -10,10 +10,7 @@ module.exports = {
     overrides: [
         {
             files: ['**/*.ts'],
-            extends: [
-                'plugin:@typescript-eslint/recommended',
-                'prettier/@typescript-eslint',
-            ],
+            extends: ['plugin:@typescript-eslint/recommended'],
             plugins: ['@typescript-eslint'],
             parser: '@typescript-eslint/parser',
             parserOptions: {

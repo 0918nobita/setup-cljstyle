@@ -8,8 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
-        with:
-          cljstyle-version: 0.13.0
       - run: cljstyle version
 
   macOS:
@@ -17,8 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
-        with:
-          cljstyle-version: 0.13.0
       - run: cljstyle version
 
   linux:
@@ -26,6 +22,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
-        with:
-          cljstyle-version: 0.13.0
       - run: cljstyle version

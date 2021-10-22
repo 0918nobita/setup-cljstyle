@@ -9,9 +9,9 @@ Install [cljstyle](https://github.com/greglook/cljstyle)
 ```yaml
 steps:
   - uses: actions/checkout@v2
-  - uses: 0918nobita/setup-cljstyle@v0.2.0
+  - uses: 0918nobita/setup-cljstyle@v0.2.1
     with:
-      cljstyle-version: 0.13.0 # default: 0.13.0
+      cljstyle-version: 0.15.0 # default: 0.15.0
   - run: cljstyle version
   - run: cljstyle check
 ```

@@ -7,7 +7,7 @@ branding:
 inputs:
   cljstyle-version:
     description: Version of cljstyle
-    default: 0.13.0
+    default: 0.15.0
 runs:
   using: node12
   main: dist/setup-cljstyle.js

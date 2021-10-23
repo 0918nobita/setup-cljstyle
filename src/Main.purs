@@ -4,11 +4,11 @@ import Prelude
 
 import Actions.Core (InputOption(..), addPath, getInput)
 import Actions.ToolCache (find)
-import Control.Monad.Except (ExceptT, runExceptT)
+import Control.Monad.Except (ExceptT(..), runExceptT)
 import Control.Monad.Trans.Class (lift)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
-import Data.String.Regex (regex, test)
+import Data.String.Regex (Regex, regex, test)
 import Data.String.Regex.Flags (noFlags)
 import Effect (Effect)
 import Effect.Class.Console (error, log)
@@ -19,6 +19,14 @@ import Node.Process (platform)
 
 foo :: ExceptT String Effect Unit
 foo = lift $ log "foo"
+
+bar :: ExceptT String Effect Regex
+bar = ExceptT $ pure $ regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
+
+baz :: ExceptT String Effect Unit
+baz = do
+  _ <- bar
+  foo
 
 downloadUrl :: String -> String
 downloadUrl version =
@@ -32,7 +40,7 @@ downloadBinary _      version =
   let url = downloadUrl version in
     do
       log $ "download url: " <> url
-      log $ "homedir: " <> concat [homedir unit, "bin"]
+      log $ "dest dir: " <> concat [homedir unit, "bin"]
 
 main :: Effect Unit
 main = do

@@ -4,7 +4,7 @@ import Prelude
 
 import Actions.Core (InputOption(..), addPath, getInput)
 import Actions.ToolCache (downloadTool, find)
-import Control.Monad.Except (catchError, except, runExceptT)
+import Control.Monad.Except (ExceptT, catchError, except, runExceptT)
 import Control.Monad.Trans.Class (lift)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
@@ -48,27 +48,31 @@ downloadBinary _      version =
 
 main :: Effect Unit
 main = do
-  result <- runExceptT do
-    version <- lift $ getInput "cljstyle-version" (InputOption { required: false, trimWhitespace: false })
-
-    verRegex <- except $ regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
-
-    if test verRegex version
-      then do
-        foundCache <- lift $ find "cljstyle" version
-        case foundCache of
-          "" ->
-            case platform of
-              Just p -> lift $ downloadBinary p version
-              Nothing ->
-                except $ Left "Failed to identify platform"
-          cachePath ->
-            lift $ addPath cachePath
-      else
-        except $ Left "The format of cljstyle-version is invalid."
+  result <- runExceptT mainExceptT
 
   case result of
     Right _ -> mempty
     Left e -> do
       error e
       exit 1
+
+  where
+    mainExceptT :: ExceptT ErrorMessage Effect Unit
+    mainExceptT = do
+      version <- lift $ getInput "cljstyle-version" (InputOption { required: false, trimWhitespace: false })
+
+      verRegex <- except $ regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
+
+      if test verRegex version
+        then do
+          foundCache <- lift $ find "cljstyle" version
+          case foundCache of
+            "" ->
+              case platform of
+                Just p -> lift $ downloadBinary p version
+                Nothing ->
+                  except $ Left "Failed to identify platform"
+            cachePath ->
+              lift $ addPath cachePath
+        else
+          except $ Left "The format of cljstyle-version is invalid."

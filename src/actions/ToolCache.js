@@ -2,4 +2,4 @@
 
 const { find } = require('@actions/tool-cache');
 
-exports.find = (toolName) => (versionSpec) => find(toolName, versionSpec);
+exports.find = (toolName) => (versionSpec) => () => find(toolName, versionSpec);

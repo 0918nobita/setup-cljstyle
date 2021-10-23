@@ -1,3 +1,5 @@
 module Actions.ToolCache where
 
-foreign import find :: String -> String -> String
+import Effect (Effect)
+
+foreign import find :: String -> String -> Effect String

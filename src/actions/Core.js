@@ -2,6 +2,6 @@
 
 const { addPath, getInput } = require('@actions/core')
 
-exports.addPath = addPath;
+exports.addPath = (inputPath) => () => addPath(inputPath);
 
-exports.getInput = getInput;
+exports.getInput = (name) => (options) => () => getInput(name, options.value0);

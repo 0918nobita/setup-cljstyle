@@ -1,7 +1,13 @@
 module Actions.Core where
 
+import Effect (Effect)
 import Prelude
 
-foreign import addPath :: String -> Unit
+foreign import addPath :: String -> Effect Unit
 
-foreign import getInput :: String -> String
+data InputOption = InputOption
+  { required :: Boolean
+  , trimWhitespace :: Boolean
+  }
+
+foreign import getInput :: String -> InputOption -> Effect String

@@ -8,7 +8,8 @@
     "node-process",
     "prelude",
     "psci-support",
-    "strings"
+    "strings",
+    "transformers"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

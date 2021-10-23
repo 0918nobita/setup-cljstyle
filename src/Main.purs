@@ -4,6 +4,8 @@ import Prelude
 
 import Actions.Core (InputOption(..), addPath, getInput)
 import Actions.ToolCache (find)
+import Control.Monad.Except (ExceptT, runExceptT)
+import Control.Monad.Trans.Class (lift)
 import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.String.Regex (regex, test)
@@ -14,6 +16,9 @@ import Node.Os (homedir)
 import Node.Path (concat)
 import Node.Platform (Platform(Win32, Darwin))
 import Node.Process (platform)
+
+foo :: ExceptT String Effect Unit
+foo = lift $ log "foo"
 
 downloadUrl :: String -> String
 downloadUrl version =
@@ -31,6 +36,11 @@ downloadBinary _      version =
 
 main :: Effect Unit
 main = do
+  a <- runExceptT foo
+  case a of
+    Right _ -> mempty
+    Left _ -> error "Failed to call `log`"
+
   version <- getInput "cljstyle-version" (InputOption { required: false, trimWhitespace: false })
 
   case regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags of

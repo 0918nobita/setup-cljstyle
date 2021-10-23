@@ -2,7 +2,6 @@
 , dependencies = [
     "console",
     "effect",
-    "either",
     "maybe",
     "node-path",
     "node-process",

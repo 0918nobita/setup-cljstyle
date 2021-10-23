@@ -1,7 +1,8 @@
 module Actions.Core where
 
-import Effect (Effect)
 import Prelude
+
+import Effect (Effect)
 
 foreign import addPath :: String -> Effect Unit
 

@@ -1,7 +1,10 @@
 { name = "setup-cljstyle"
 , dependencies = [
+    "aff",
+    "aff-promise",
     "console",
     "effect",
+    "either",
     "maybe",
     "node-path",
     "node-process",

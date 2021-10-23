@@ -16,12 +16,14 @@ import Node.Path (concat)
 import Node.Platform (Platform(Win32, Darwin))
 import Node.Process (platform)
 
-downloadUrl :: String -> String
+type Version = String
+
+downloadUrl :: Version -> String
 downloadUrl version =
   "http://github.com/greglook/cljstyle/releases/download/"
     <> version <> "/cljstyle_" <> version <> "_linux.tar.gz"
 
-downloadBinary :: Platform -> String -> Effect Unit
+downloadBinary :: Platform -> Version -> Effect Unit
 downloadBinary Win32  _       = log "win32"
 downloadBinary Darwin _       = log "darwin"
 downloadBinary _      version =

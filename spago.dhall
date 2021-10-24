@@ -6,6 +6,8 @@
     "effect",
     "either",
     "maybe",
+    "node-buffer",
+    "node-fs",
     "node-path",
     "node-process",
     "prelude",

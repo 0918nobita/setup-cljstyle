@@ -8,6 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
+      - run: cljstyle version
 
   macOS:
     runs-on: macos-latest

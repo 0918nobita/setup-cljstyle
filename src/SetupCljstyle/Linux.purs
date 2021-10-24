@@ -4,10 +4,11 @@ module SetupCljstyle.Linux
 
 import Prelude
 
-import Actions.ToolCache (downloadTool)
+import Actions.Core (addPath)
+import Actions.ToolCache (downloadTool, extractTar)
 import Control.Monad.Except (catchError)
 import Effect (Effect)
-import Effect.Aff (launchAff_)
+import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (error, info)
 import Node.Os (homedir)
@@ -20,18 +21,32 @@ downloadUrl version =
   "http://github.com/greglook/cljstyle/releases/download/"
     <> version <> "/cljstyle_" <> version <> "_linux.tar.gz"
 
-installBin :: Version -> Effect Unit
-installBin version =
+downloadTar :: Version -> Aff String
+downloadTar version =
   let
     url = downloadUrl version
-    destDir = concat [homedir unit, "bin"]
-  in do
-    info $ "dest dir: " <> destDir
-    info $ "Downloading " <> url <> " ..."
-    launchAff_ $ catchError
-      (do
-        tarPath <- downloadTool url
-        info $ "Complete (" <> tarPath <> ")")
-      (\_ -> liftEffect do
-        error $ "Failed to download " <> url
-        exit 1)
+    tryDownloadTar = downloadTool url
+  in
+  catchError
+    tryDownloadTar
+    (\_ -> liftEffect do
+      error $ "Failed to download " <> url
+      exit 1)
+
+extractCljstyleTar :: String -> String -> Aff String
+extractCljstyleTar tarPath binDir =
+  catchError
+    (extractTar tarPath binDir)
+    (\_ -> liftEffect do
+      error $ "Failed to extract " <> tarPath
+      exit 1)
+
+installBin :: Version -> Effect Unit
+installBin version =
+  let binDir = concat [homedir unit, "bin"] in
+  launchAff_ do
+    tarPath <- downloadTar version
+    extractedDir <- extractCljstyleTar tarPath binDir
+    liftEffect do
+      info $ "Extracted dir: " <> extractedDir
+      addPath extractedDir

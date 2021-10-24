@@ -1,6 +1,8 @@
 "use strict";
 
-const { extractTar, downloadTool, find } = require('@actions/tool-cache');
+const { cacheDir, extractTar, downloadTool, find } = require('@actions/tool-cache');
+
+exports._cacheDir = (sourceDir) => (tool) => (version) => cacheDir(sourceDir, tool, version);
 
 exports._extractTar = (file) => (dest) => extractTar(file, dest);
 

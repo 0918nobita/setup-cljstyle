@@ -5,12 +5,12 @@ module SetupCljstyle.Linux
 import Prelude
 
 import Actions.Core (addPath)
-import Actions.ToolCache (downloadTool, extractTar)
+import Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Control.Monad.Except (catchError)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (error, info)
+import Effect.Class.Console (error)
 import Node.Os (homedir)
 import Node.Path (concat)
 import Node.Process (exit)
@@ -46,7 +46,9 @@ installBin version =
   let binDir = concat [homedir unit, "bin"] in
   launchAff_ do
     tarPath <- downloadTar version
+
     extractedDir <- extractCljstyleTar tarPath binDir
-    liftEffect do
-      info $ "Extracted dir: " <> extractedDir
-      addPath extractedDir
+
+    _ <- cacheDir extractedDir "cljstyle" version
+
+    liftEffect $ addPath extractedDir

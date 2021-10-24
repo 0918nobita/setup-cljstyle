@@ -2,10 +2,10 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .js,.ts",
-    "format": "eslint --fix --ext .js,.ts",
-    "typecheck": "tsc",
-    "build": "ts-eager scripts/build.ts",
+    "lint": "eslint --ext .js",
+    "format": "eslint --fix --ext .js",
+    "build": "spago build && node build.js",
+    "test": "spago test",
     "git-add": "git add dist/setup-cljstyle.js"
   },
   "pre-commit": [
@@ -18,17 +18,9 @@
     "@actions/tool-cache": "1.7.1"
   },
   "devDependencies": {
-    "@types/node": "16.11.2",
-    "@typescript-eslint/eslint-plugin": "5.1.0",
-    "@typescript-eslint/parser": "5.1.0",
     "esbuild": "0.13.8",
-    "eslint": "8.0.1",
-    "eslint-config-prettier": "8.3.0",
-    "eslint-plugin-prettier": "4.0.0",
-    "eslint-plugin-simple-import-sort": "7.0.0",
     "pre-commit": "1.2.2",
-    "prettier": "2.4.1",
-    "ts-eager": "2.0.2",
-    "typescript": "4.4.4"
+    "purescript": "^0.14.4",
+    "spago": "^0.20.3"
   }
 }

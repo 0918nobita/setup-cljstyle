@@ -1,1 +1,4 @@
-node_modules
+/.spago
+/node_modules
+/output
+/.psc-ide-port

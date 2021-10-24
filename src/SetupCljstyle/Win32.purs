@@ -25,10 +25,10 @@ downloadJar :: Version -> Aff String
 downloadJar version =
   let
     url = downloadUrl version
-    tryDownloadTar = downloadTool url
+    tryDownloadJar = downloadTool url
   in
   catchError
-    tryDownloadTar
+    tryDownloadJar
     (\_ -> liftEffect do
       error $ "Failed to download " <> url
       exit 1)

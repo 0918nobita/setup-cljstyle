@@ -4,8 +4,6 @@ module SetupCljstyle.Main
 
 import Prelude
 
-import Actions.Core (InputOption(..), addPath, getInput)
-import Actions.ToolCache (find)
 import Control.Monad.Except (ExceptT, except, runExceptT)
 import Control.Monad.Trans.Class (lift)
 import Data.Either (Either(..), either)
@@ -14,6 +12,8 @@ import Data.String.Regex (regex, test)
 import Data.String.Regex.Flags (noFlags)
 import Effect (Effect)
 import Effect.Class.Console (error)
+import GitHub.Actions.Core (InputOption(..), addPath, getInput)
+import GitHub.Actions.ToolCache (find)
 import Node.Platform (Platform(Win32, Darwin))
 import Node.Process (exit, platform)
 import SetupCljstyle.Win32 as Win32

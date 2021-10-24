@@ -2,14 +2,14 @@ module SetupCljstyle.Win32 where
 
 import Prelude
 
-import Actions.Core (addPath)
-import Actions.Io (mv)
-import Actions.ToolCache (cacheDir, downloadTool)
 import Control.Monad.Except (catchError)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (error)
+import GitHub.Actions.Core (addPath)
+import GitHub.Actions.Io (mv)
+import GitHub.Actions.ToolCache (cacheDir, downloadTool)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS.Sync (writeTextFile)
 import Node.Path (concat)

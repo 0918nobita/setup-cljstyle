@@ -1,4 +1,4 @@
-module Actions.ToolCache
+module GitHub.Actions.ToolCache
   ( cacheDir
   , extractTar
   , downloadTool

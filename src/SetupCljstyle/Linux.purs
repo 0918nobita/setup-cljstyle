@@ -4,13 +4,13 @@ module SetupCljstyle.Linux
 
 import Prelude
 
-import Actions.Core (addPath)
-import Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Control.Monad.Except (catchError)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (error)
+import GitHub.Actions.Core (addPath)
+import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Node.Os (homedir)
 import Node.Path (concat)
 import Node.Process (exit)

@@ -1,4 +1,4 @@
-module Actions.Io where
+module GitHub.Actions.Io where
 
 import Prelude
 

@@ -2,13 +2,13 @@ module SetupCljstyle.Darwin where
 
 import Prelude
 
-import Actions.Core (addPath)
-import Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Control.Monad.Except (catchError)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (error)
+import GitHub.Actions.Core (addPath)
+import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Node.Process (exit)
 import SetupCljstyle.Types (Version, Url)
 

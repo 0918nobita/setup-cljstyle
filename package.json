@@ -2,9 +2,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .js",
-    "format": "eslint --fix --ext .js",
-    "build": "spago build && node build.js",
+    "compile": "spago build",
+    "bundle": "esbuild --platform=node --bundle --minify src/bootstrap.js --outfile=dist/setup-cljstyle.js",
+    "build": "pnpm run compile && pnpm run bundle",
     "test": "spago test",
     "git-add": "git add dist/setup-cljstyle.js"
   },

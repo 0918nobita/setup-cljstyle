@@ -1,4 +1,6 @@
-module SetupCljstyle.Linux where
+module SetupCljstyle.Linux
+  ( installBin
+  ) where
 
 import Prelude
 

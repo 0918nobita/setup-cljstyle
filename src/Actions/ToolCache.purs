@@ -8,6 +8,7 @@ module Actions.ToolCache
 import Prelude
 
 import Control.Promise (Promise, toAff)
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Aff)
 
@@ -26,4 +27,11 @@ foreign import _downloadTool :: String -> Promise String
 downloadTool :: String -> Aff String
 downloadTool = toAff <<< _downloadTool
 
-foreign import find :: String -> String -> Effect String
+foreign import _find :: String -> String -> Effect String
+
+find :: String -> String -> Effect (Maybe String)
+find toolName versionSpec = do
+  pathOpt <- _find toolName versionSpec
+  pure case pathOpt of
+    "" -> Nothing
+    p  -> Just p

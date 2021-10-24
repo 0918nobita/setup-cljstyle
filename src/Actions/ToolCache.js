@@ -8,4 +8,4 @@ exports._extractTar = (file) => (dest) => extractTar(file, dest);
 
 exports._downloadTool = (url) => downloadTool(url);
 
-exports.find = (toolName) => (versionSpec) => () => find(toolName, versionSpec);
+exports._find = (toolName) => (versionSpec) => () => find(toolName, versionSpec);

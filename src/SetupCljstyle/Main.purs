@@ -1,4 +1,6 @@
-module SetupCljstyle.Main where
+module SetupCljstyle.Main
+  ( main
+  ) where
 
 import Prelude
 
@@ -24,29 +26,26 @@ installBin Win32  = Win32.installBin
 installBin Darwin = Darwin.installBin
 installBin _      = Linux.installBin
 
+mainExceptT :: ExceptT ErrorMessage Effect Unit
+mainExceptT = do
+  version <- lift $ getInput "cljstyle-version" $ InputOption { required: false, trimWhitespace: false }
+
+  verRegex <- except $ regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
+
+  if test verRegex version
+    then do
+      cachePathOpt <- lift $ find "cljstyle" version
+      case cachePathOpt of
+        Just cachePath -> lift $ addPath cachePath
+        Nothing -> case platform of
+          Just p  -> lift $ installBin p version
+          Nothing -> except $ Left "Failed to identify platform"
+    else
+      except $ Left "The format of cljstyle-version is invalid."
+
 main :: Effect Unit
 main =
   runExceptT mainExceptT
     >>= either
       (\e -> error e *> exit 1)
       (\_ -> mempty)
-  where
-    mainExceptT :: ExceptT ErrorMessage Effect Unit
-    mainExceptT = do
-      version <- lift $ getInput "cljstyle-version" (InputOption { required: false, trimWhitespace: false })
-
-      verRegex <- except $ regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
-
-      if test verRegex version
-        then do
-          foundCache <- lift $ find "cljstyle" version
-          case foundCache of
-            "" ->
-              case platform of
-                Just p -> lift $ installBin p version
-                Nothing ->
-                  except $ Left "Failed to identify platform"
-            cachePath ->
-              lift $ addPath cachePath
-        else
-          except $ Left "The format of cljstyle-version is invalid."

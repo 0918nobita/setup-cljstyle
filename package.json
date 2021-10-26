@@ -16,14 +16,14 @@
     "@actions/core": "1.6.0",
     "@actions/io": "1.1.1",
     "@actions/tool-cache": "1.7.1",
-    "node-fetch": "^3.0.0"
+    "node-fetch": "3.0.0"
   },
   "devDependencies": {
-    "@types/node": "^16.11.4",
-    "esbuild": "0.13.8",
+    "@types/node": "16.11.6",
+    "esbuild": "0.13.9",
     "pre-commit": "1.2.2",
-    "purescript": "^0.14.4",
-    "spago": "^0.20.3",
-    "typescript": "^4.4.4"
+    "purescript": "0.14.5",
+    "spago": "0.20.3",
+    "typescript": "4.4.4"
   }
 }

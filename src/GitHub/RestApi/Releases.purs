@@ -8,7 +8,7 @@ import Data.Argonaut (decodeJson, jsonParser)
 import Data.EitherR (fmapL)
 import Effect.Aff (Aff)
 
-foreign import _fetchLatestRelease :: String -> String -> Promise String
+foreign import _fetchLatestRelease :: String -> String -> String -> Promise String
 
 type Release = { tag_name :: String }
 
@@ -19,9 +19,9 @@ instance showError :: Show Error where
   show FailedToParse = "Failed to parse JSON"
   show FailedToDecode = "Failed to decode the received JSON data"
 
-fetchLatestRelease :: String -> String -> ExceptT Error Aff String
-fetchLatestRelease owner repo = ExceptT do
-  release <- toAff $ _fetchLatestRelease owner repo
+fetchLatestRelease :: String -> String -> String -> ExceptT Error Aff String
+fetchLatestRelease authToken owner repo = ExceptT do
+  release <- toAff $ _fetchLatestRelease authToken owner repo
 
   pure do
     parsed <- jsonParser release # fmapL (\_ -> FailedToParse)

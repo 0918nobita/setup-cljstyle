@@ -26,6 +26,10 @@ getVerOption :: Effect String
 getVerOption =
   getInput "cljstyle-version" $ InputOption { required: false, trimWhitespace: false }
 
+getAuthToken :: Effect String
+getAuthToken =
+  getInput "token" $ InputOption { required: false, trimWhitespace: false }
+
 versionRegex :: Either ErrorMessage Regex
 versionRegex =
   regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
@@ -55,8 +59,9 @@ newlyInstallBin version = mapExceptT liftEffect do
 
 mainExceptT :: ExceptT ErrorMessage Effect Unit
 mainExceptT = do
+  authToken <- lift getAuthToken
   lift $ launchAff_ $ runExceptT do
-    version <- specifiedVersion <|> (fetchLatestRelease "greglook" "cljstyle" # withExceptT show)
+    version <- specifiedVersion <|> (fetchLatestRelease authToken "greglook" "cljstyle" # withExceptT show)
     (usingCache version) <|> (newlyInstallBin version)
 
 main :: Effect Unit

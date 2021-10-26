@@ -5,8 +5,11 @@ branding:
   icon: check
   color: green
 inputs:
+  token:
+    description: The GitHub authentication token
+    default: ${{ github.token }}
   cljstyle-version:
-    description: Version of cljstyle
+    description: The version of cljstyle
 runs:
   using: node12
   main: dist/setup-cljstyle.js

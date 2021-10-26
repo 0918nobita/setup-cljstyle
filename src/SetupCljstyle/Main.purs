@@ -4,36 +4,59 @@ module SetupCljstyle.Main
 
 import Prelude
 
-import Control.Monad.Except (ExceptT, except, runExceptT)
+import Control.Alt ((<|>))
+import Control.Monad.Except (ExceptT, except, mapExceptT, runExceptT, withExceptT)
 import Control.Monad.Trans.Class (lift)
 import Data.Either (Either(..), either)
-import Data.Maybe (Maybe(..))
-import Data.String.Regex (regex, test)
+import Data.String.Regex (Regex, regex, test)
 import Data.String.Regex.Flags (noFlags)
 import Effect (Effect)
+import Effect.Aff (Aff, launchAff_)
+import Effect.Class (liftEffect)
 import Effect.Class.Console (error)
 import GitHub.Actions.Core (InputOption(..), addPath, getInput)
 import GitHub.Actions.ToolCache (find)
-import Node.Process (exit, platform)
+import GitHub.RestApi.Releases (fetchLatestRelease)
+import Node.Process (exit)
+import Node.ProcessExt (platform)
 import SetupCljstyle.Installer (installBin)
-import SetupCljstyle.Types (ErrorMessage)
+import SetupCljstyle.Types (Version, ErrorMessage)
+
+getVerOption :: Effect String
+getVerOption =
+  getInput "cljstyle-version" $ InputOption { required: false, trimWhitespace: false }
+
+versionRegex :: Either ErrorMessage Regex
+versionRegex =
+  regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
+
+specifiedVersion :: ExceptT ErrorMessage Aff Version
+specifiedVersion = do
+  version <- liftEffect getVerOption
+  if version == ""
+    then except $ Left "Version is not specified"
+    else do
+      verRegex <- except versionRegex
+
+      except $ if test verRegex version
+        then Right version
+        else Left "The format of cljstyle-version is invalid."
+
+usingCache :: Version -> ExceptT ErrorMessage Aff Unit
+usingCache version = mapExceptT liftEffect do
+  cachePath <- find "cljstyle" version # withExceptT (\_ -> "Cache not found")
+  lift $ addPath cachePath
+
+newlyInstallBin :: Version -> ExceptT ErrorMessage Aff Unit
+newlyInstallBin version = mapExceptT liftEffect do
+  p <- except platform # withExceptT (\_ -> "Failed to identify platform")
+  lift $ installBin p version
 
 mainExceptT :: ExceptT ErrorMessage Effect Unit
 mainExceptT = do
-  version <- lift $ getInput "cljstyle-version" $ InputOption { required: false, trimWhitespace: false }
-
-  verRegex <- except $ regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
-
-  if test verRegex version
-    then do
-      cachePathOpt <- lift $ find "cljstyle" version
-      case cachePathOpt of
-        Just cachePath -> lift $ addPath cachePath
-        Nothing -> case platform of
-          Just p  -> lift $ installBin p version
-          Nothing -> except $ Left "Failed to identify platform"
-    else
-      except $ Left "The format of cljstyle-version is invalid."
+  lift $ launchAff_ $ runExceptT do
+    version <- specifiedVersion <|> (fetchLatestRelease "greglook" "cljstyle" # withExceptT show)
+    (usingCache version) <|> (newlyInstallBin version)
 
 main :: Effect Unit
 main =

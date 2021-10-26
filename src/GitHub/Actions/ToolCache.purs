@@ -7,8 +7,9 @@ module GitHub.Actions.ToolCache
 
 import Prelude
 
+import Control.Monad.Except (ExceptT(..))
 import Control.Promise (Promise, toAff)
-import Data.Maybe (Maybe(..))
+import Data.Either (Either(..))
 import Effect (Effect)
 import Effect.Aff (Aff)
 
@@ -29,9 +30,9 @@ downloadTool = toAff <<< _downloadTool
 
 foreign import _find :: String -> String -> Effect String
 
-find :: String -> String -> Effect (Maybe String)
-find toolName versionSpec = do
+find :: String -> String -> ExceptT Unit Effect String
+find toolName versionSpec = ExceptT do
   pathOpt <- _find toolName versionSpec
   pure case pathOpt of
-    "" -> Nothing
-    p  -> Just p
+    "" -> Left unit
+    p  -> Right p

@@ -33,12 +33,13 @@ versionRegex =
 specifiedVersion :: ExceptT ErrorMessage Aff Version
 specifiedVersion = do
   version <- liftEffect getVerOption
-  if version == ""
-    then except $ Left "Version is not specified"
-    else do
-      verRegex <- except versionRegex
 
-      except $ if test verRegex version
+  except if version == ""
+    then Left "Version is not specified"
+    else do
+      verRegex <- versionRegex
+
+      if test verRegex version
         then Right version
         else Left "The format of cljstyle-version is invalid."
 

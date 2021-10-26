@@ -1,4 +1,4 @@
-module SetupCljstyle.Linux
+module SetupCljstyle.Installer.Linux
   ( installBin
   ) where
 

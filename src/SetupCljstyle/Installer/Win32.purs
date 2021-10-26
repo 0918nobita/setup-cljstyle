@@ -1,4 +1,4 @@
-module SetupCljstyle.Win32 where
+module SetupCljstyle.Installer.Win32 where
 
 import Prelude
 

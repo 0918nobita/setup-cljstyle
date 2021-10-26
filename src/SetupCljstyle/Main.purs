@@ -14,17 +14,9 @@ import Effect (Effect)
 import Effect.Class.Console (error)
 import GitHub.Actions.Core (InputOption(..), addPath, getInput)
 import GitHub.Actions.ToolCache (find)
-import Node.Platform (Platform(Win32, Darwin))
 import Node.Process (exit, platform)
-import SetupCljstyle.Win32 as Win32
-import SetupCljstyle.Darwin as Darwin
-import SetupCljstyle.Linux as Linux
-import SetupCljstyle.Types (ErrorMessage, Version)
-
-installBin :: Platform -> Version -> Effect Unit
-installBin Win32  = Win32.installBin
-installBin Darwin = Darwin.installBin
-installBin _      = Linux.installBin
+import SetupCljstyle.Installer (installBin)
+import SetupCljstyle.Types (ErrorMessage)
 
 mainExceptT :: ExceptT ErrorMessage Effect Unit
 mainExceptT = do

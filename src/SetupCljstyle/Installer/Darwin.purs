@@ -1,4 +1,4 @@
-module SetupCljstyle.Darwin where
+module SetupCljstyle.Installer.Darwin where
 
 import Prelude
 

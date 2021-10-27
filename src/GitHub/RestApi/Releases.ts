@@ -1,6 +1,12 @@
 import fetch from 'node-fetch';
 
-const _fetchLatestRelease = (authToken: string) => (owner: string) => async (repo: string) => {
+type FetchLatestReleaseArgs = {
+  authToken: string;
+  owner: string;
+  repo: string;
+};
+
+const _fetchLatestRelease = async ({ authToken, owner, repo }: FetchLatestReleaseArgs) => {
   const res = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/releases/latest`,
     {

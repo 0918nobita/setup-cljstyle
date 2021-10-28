@@ -5,14 +5,14 @@
     "dev": "tsc && spago build --watch",
     "compile": "tsc && spago build",
     "bundle": "esbuild --platform=node --bundle --minify src/bootstrap.js --outfile=dist/setup-cljstyle.js",
-    "build": "pnpm run compile && pnpm run bundle",
+    "build": "pnpm compile && pnpm bundle",
     "lint": "concurrently npm:lint:src npm:lint:test",
     "lint:src": "purty validate src",
     "lint:test": "purty validate test",
     "format": "concurrently npm:format:src npm:format:test",
     "format:src": "purty src --write",
     "format:test": "purty test --write",
-    "test": "spago test",
+    "test": "tsc && spago test",
     "git-add": "git add dist/setup-cljstyle.js"
   },
   "pre-commit": [

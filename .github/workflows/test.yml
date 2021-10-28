@@ -3,8 +3,20 @@ name: Test
 on: push
 
 jobs:
-  windows:
+  purs-test:
+    runs-on: ubuntu-latest
+    name: PureScript Test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 6.18.0
+          run_install: true
+      - run: pnpm test
+
+  use-on-windows:
     runs-on: windows-latest
+    name: Use this action on Windows
     steps:
       - uses: actions/checkout@v2
       - uses: ./
@@ -12,8 +24,9 @@ jobs:
           cljstyle-version: "0.15.0"
       - run: cljstyle version
 
-  macOS:
+  use-on-macOS:
     runs-on: macos-latest
+    name: Use this action on macOS
     steps:
       - uses: actions/checkout@v2
       - uses: ./
@@ -21,8 +34,9 @@ jobs:
           cljstyle-version: "0.14.0"
       - run: cljstyle version
 
-  linux:
+  use-on-linux:
     runs-on: ubuntu-latest
+    name: Use this action on Linux
     steps:
       - uses: actions/checkout@v2
       - uses: ./

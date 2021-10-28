@@ -1,0 +1,15 @@
+name: Lint
+
+on: push
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: PureScript Lint
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 6.18.0
+          run_install: true
+      - run: pnpm lint

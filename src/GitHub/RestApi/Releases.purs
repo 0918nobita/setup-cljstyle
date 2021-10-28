@@ -7,6 +7,7 @@ import Control.Promise (Promise, toAff)
 import Data.Argonaut (decodeJson, jsonParser)
 import Data.EitherR (fmapL)
 import Effect.Aff (Aff)
+import SetupCljstyle.Types (Version(..))
 
 type FetchLatestReleaseArgs = {
   authToken :: String,
@@ -25,11 +26,11 @@ instance showError :: Show Error where
   show FailedToParse = "Failed to parse JSON"
   show FailedToDecode = "Failed to decode the received JSON data"
 
-fetchLatestRelease :: FetchLatestReleaseArgs -> ExceptT Error Aff String
+fetchLatestRelease :: FetchLatestReleaseArgs -> ExceptT Error Aff Version
 fetchLatestRelease args = ExceptT do
   release <- toAff $ _fetchLatestRelease args
 
   pure do
     parsed <- jsonParser release # fmapL (\_ -> FailedToParse)
     decoded :: Release <- decodeJson parsed # fmapL (\_ -> FailedToDecode)
-    pure decoded.tag_name
+    pure $ Version decoded.tag_name

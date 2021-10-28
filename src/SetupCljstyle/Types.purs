@@ -1,7 +1,10 @@
 module SetupCljstyle.Types where
 
-type Version = String
+import Prelude
 
-type Url = String
+newtype Version = Version String
+
+instance showVersion :: Show Version where
+  show (Version v) = v
 
 type ErrorMessage = String

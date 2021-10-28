@@ -9,12 +9,13 @@ import Effect.Class (liftEffect)
 import Effect.Class.Console (error)
 import GitHub.Actions.Core (addPath)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
+import Milkis (URL(..))
 import Node.Process (exit)
-import SetupCljstyle.Types (Version, Url)
+import SetupCljstyle.Types (Version(..))
 
-downloadUrl :: Version -> Url
-downloadUrl version =
-  "http://github.com/greglook/cljstyle/releases/download/"
+downloadUrl :: Version -> URL
+downloadUrl (Version version) =
+  URL $ "http://github.com/greglook/cljstyle/releases/download/"
     <> version <> "/cljstyle_" <> version <> "_macos.tar.gz"
 
 downloadTar :: Version -> Aff String
@@ -26,7 +27,7 @@ downloadTar version =
   catchError
     tryDownloadTar
     (\_ -> liftEffect do
-      error $ "Failed to download " <> url
+      error $ "Failed to download " <> show url
       exit 1)
 
 extractCljstyleTar :: String -> String -> Aff String

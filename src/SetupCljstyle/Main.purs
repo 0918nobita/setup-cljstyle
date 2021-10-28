@@ -21,7 +21,7 @@ import GitHub.RestApi.Releases (fetchLatestRelease)
 import Node.Process (exit)
 import Node.ProcessExt (platform)
 import SetupCljstyle.Installer (installBin)
-import SetupCljstyle.Types (Version, ErrorMessage)
+import SetupCljstyle.Types (ErrorMessage, Version(..))
 
 getVerOption :: Effect String
 getVerOption = getOptionalInput "cljstyle-version"
@@ -43,7 +43,7 @@ specifiedVersion = mapExceptT liftEffect $ ExceptT do
       verRegex <- versionRegex
 
       if test verRegex version
-        then Right version
+        then Right $ Version version
         else Left "The format of cljstyle-version is invalid.\n"
 
 usingCache :: Version -> ExceptT ErrorMessage Aff Unit

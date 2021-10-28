@@ -9,6 +9,7 @@
   , "either"
   , "errors"
   , "maybe"
+  , "milkis"
   , "node-buffer"
   , "node-fs"
   , "node-path"

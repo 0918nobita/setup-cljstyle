@@ -17,6 +17,7 @@
   , "node-process"
   , "prelude"
   , "psci-support"
+  , "spec"
   , "strings"
   , "transformers"
   ]

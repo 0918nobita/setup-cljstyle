@@ -9,6 +9,9 @@ instance showVersion :: Show Version where
 
 newtype ErrorMessage = ErrorMessage String
 
+instance eqErrorMessage :: Eq ErrorMessage where
+  eq (ErrorMessage a) (ErrorMessage b) = a == b
+
 instance showErrorMessage :: Show ErrorMessage where
   show (ErrorMessage msg) = msg
 

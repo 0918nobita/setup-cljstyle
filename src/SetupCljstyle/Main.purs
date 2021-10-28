@@ -3,7 +3,6 @@ module SetupCljstyle.Main
   ) where
 
 import Prelude
-
 import Control.Alt ((<|>))
 import Control.Monad.Except (ExceptT(..), catchError, except, mapExceptT, runExceptT, withExceptT)
 import Control.Monad.Trans.Class (lift)
@@ -31,38 +30,42 @@ getAuthToken :: Effect String
 getAuthToken = getOptionalInput "token"
 
 versionRegex :: Either ErrorMessage Regex
-versionRegex =
-  regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags # fmapL ErrorMessage
+versionRegex = regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags # fmapL ErrorMessage
 
 specifiedVersion :: ExceptT ErrorMessage Aff Version
-specifiedVersion = mapExceptT liftEffect $ ExceptT do
-  version <- getVerOption
-
-  pure if null version
-    then Left $ ErrorMessage "Version is not specified"
-    else do
-      verRegex <- versionRegex
-
-      if test verRegex version
-        then Right $ Version version
-        else Left $ ErrorMessage "The format of cljstyle-version is invalid."
+specifiedVersion =
+  mapExceptT liftEffect
+    $ ExceptT do
+        version <- getVerOption
+        pure
+          if null version then
+            Left $ ErrorMessage "Version is not specified"
+          else do
+            verRegex <- versionRegex
+            if test verRegex version then
+              Right $ Version version
+            else
+              Left $ ErrorMessage "The format of cljstyle-version is invalid."
 
 usingCache :: Version -> ExceptT ErrorMessage Aff Unit
-usingCache version = mapExceptT liftEffect do
-  cachePath <- find "cljstyle" version # withExceptT (\_ -> ErrorMessage "Cache not found")
-  lift $ addPath cachePath
+usingCache version =
+  mapExceptT liftEffect do
+    cachePath <- find "cljstyle" version # withExceptT (\_ -> ErrorMessage "Cache not found")
+    lift $ addPath cachePath
 
 newlyInstallBin :: Version -> ExceptT ErrorMessage Aff Unit
-newlyInstallBin version = mapExceptT liftEffect do
-  p <- except platform # withExceptT (\_ -> ErrorMessage "Failed to identify platform")
-  lift $ installBin p version
+newlyInstallBin version =
+  mapExceptT liftEffect do
+    p <- except platform # withExceptT (\_ -> ErrorMessage "Failed to identify platform")
+    lift $ installBin p version
 
 handleError :: ErrorMessage -> ExceptT ErrorMessage Aff Unit
 handleError msg = liftEffect $ error (show msg) *> exit 1
 
 mainAff :: String -> ExceptT ErrorMessage Aff Unit
 mainAff authToken = do
-  let fetchedLatestVersion = fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
+  let
+    fetchedLatestVersion = fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
   version <- specifiedVersion <|> fetchedLatestVersion
   usingCache version <|> newlyInstallBin version
 

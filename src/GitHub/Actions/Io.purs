@@ -1,7 +1,6 @@
 module GitHub.Actions.Io where
 
 import Prelude
-
 import Control.Promise (Promise, toAff)
 import Effect.Aff (Aff)
 

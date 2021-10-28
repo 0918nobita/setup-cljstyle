@@ -8,13 +8,14 @@ import Control.Alt ((<|>))
 import Control.Monad.Except (ExceptT(..), catchError, except, mapExceptT, runExceptT, withExceptT)
 import Control.Monad.Trans.Class (lift)
 import Data.Either (Either(..))
+import Data.String (null)
 import Data.String.Regex (Regex, regex, test)
 import Data.String.Regex.Flags (noFlags)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (error)
-import GitHub.Actions.Core (InputOption(..), addPath, getInput)
+import GitHub.Actions.Core (addPath, getOptionalInput)
 import GitHub.Actions.ToolCache (find)
 import GitHub.RestApi.Releases (fetchLatestRelease)
 import Node.Process (exit)
@@ -23,12 +24,10 @@ import SetupCljstyle.Installer (installBin)
 import SetupCljstyle.Types (Version, ErrorMessage)
 
 getVerOption :: Effect String
-getVerOption =
-  getInput "cljstyle-version" $ InputOption { required: false, trimWhitespace: false }
+getVerOption = getOptionalInput "cljstyle-version"
 
 getAuthToken :: Effect String
-getAuthToken =
-  getInput "token" $ InputOption { required: false, trimWhitespace: false }
+getAuthToken = getOptionalInput "token"
 
 versionRegex :: Either ErrorMessage Regex
 versionRegex =
@@ -38,7 +37,7 @@ specifiedVersion :: ExceptT ErrorMessage Aff Version
 specifiedVersion = mapExceptT liftEffect $ ExceptT do
   version <- getVerOption
 
-  pure if version == ""
+  pure if null version
     then Left "Version is not specified\n"
     else do
       verRegex <- versionRegex
@@ -63,11 +62,11 @@ handleError msg = liftEffect $ error msg *> exit 1
 mainAff :: String -> ExceptT ErrorMessage Aff Unit
 mainAff authToken = do
   let fetchedLatestVersion = withExceptT show $
-        fetchLatestRelease {
-          authToken,
-          owner: "greglook",
-          repo: "cljstyle"
-        }
+        fetchLatestRelease
+          { authToken
+          , owner: "greglook"
+          , repo: "cljstyle"
+          }
   version <- specifiedVersion <|> fetchedLatestVersion
   usingCache version <|> newlyInstallBin version
 

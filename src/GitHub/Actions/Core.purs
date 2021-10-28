@@ -12,3 +12,6 @@ data InputOption = InputOption
   }
 
 foreign import getInput :: String -> InputOption -> Effect String
+
+getOptionalInput :: String -> Effect String
+getOptionalInput name = getInput name $ InputOption { required: false, trimWhitespace: false }

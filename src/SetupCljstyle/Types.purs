@@ -7,4 +7,10 @@ newtype Version = Version String
 instance showVersion :: Show Version where
   show (Version v) = v
 
-type ErrorMessage = String
+newtype ErrorMessage = ErrorMessage String
+
+instance showErrorMessage :: Show ErrorMessage where
+  show (ErrorMessage msg) = msg
+
+instance semigroupErrMsg :: Semigroup ErrorMessage where
+  append _ e = e

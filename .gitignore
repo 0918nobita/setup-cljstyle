@@ -2,4 +2,5 @@
 /node_modules
 /output
 /.psc-ide-port
+/.psci_modules
 /src/**/*.js

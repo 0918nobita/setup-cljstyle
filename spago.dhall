@@ -8,6 +8,7 @@
   , "effect"
   , "either"
   , "errors"
+  , "foreign-object"
   , "maybe"
   , "milkis"
   , "node-buffer"

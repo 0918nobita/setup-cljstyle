@@ -1,13 +1,18 @@
-module GitHub.RestApi.Releases where
+module GitHub.RestApi.Releases
+  ( fetchLatestRelease
+  ) where
 
 import Prelude
 
-import Control.Monad.Except (ExceptT(..))
-import Control.Promise (Promise, toAff)
-import Data.Argonaut (decodeJson, jsonParser)
+import Control.Monad.Except (ExceptT, except, lift)
+import Data.Argonaut (decodeJson, jsonParser, printJsonDecodeError)
 import Data.EitherR (fmapL)
 import Effect.Aff (Aff)
-import SetupCljstyle.Types (Version(..))
+import Foreign.Object (singleton)
+import Milkis (getMethod)
+import Milkis as M
+import Milkis.Impl.Node (nodeFetch)
+import SetupCljstyle.Types (Version(..), ErrorMessage(..))
 
 type FetchLatestReleaseArgs = {
   authToken :: String,
@@ -15,22 +20,19 @@ type FetchLatestReleaseArgs = {
   repo :: String
 }
 
-foreign import _fetchLatestRelease :: FetchLatestReleaseArgs -> Promise String
-
 type Release = { tag_name :: String }
 
-data Error = FailedToParse
-           | FailedToDecode
+fetch :: M.Fetch
+fetch = M.fetch nodeFetch
 
-instance showError :: Show Error where
-  show FailedToParse = "Failed to parse JSON"
-  show FailedToDecode = "Failed to decode the received JSON data"
-
-fetchLatestRelease :: FetchLatestReleaseArgs -> ExceptT Error Aff Version
-fetchLatestRelease args = ExceptT do
-  release <- toAff $ _fetchLatestRelease args
-
-  pure do
-    parsed <- jsonParser release # fmapL (\_ -> FailedToParse)
-    decoded :: Release <- decodeJson parsed # fmapL (\_ -> FailedToDecode)
-    pure $ Version decoded.tag_name
+fetchLatestRelease :: FetchLatestReleaseArgs -> ExceptT ErrorMessage Aff Version
+fetchLatestRelease args = do
+  let url = "https://api.github.com/repos/" <> args.owner <> "/" <> args.repo <> "/releases/latest"
+  res <- lift $ fetch (M.URL url)
+    { method: getMethod
+    , headers: singleton "Authorization" $ "Bearer " <> args.authToken
+    }
+  resBody <- lift $ M.text res
+  parsed <- except $ jsonParser resBody # fmapL ErrorMessage
+  decoded :: Release <- except $ decodeJson parsed # fmapL (ErrorMessage <<< printJsonDecodeError)
+  pure $ Version decoded.tag_name

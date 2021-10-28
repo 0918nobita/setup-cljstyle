@@ -62,12 +62,7 @@ handleError msg = liftEffect $ error (show msg) *> exit 1
 
 mainAff :: String -> ExceptT ErrorMessage Aff Unit
 mainAff authToken = do
-  let fetchedLatestVersion = withExceptT (ErrorMessage <<< show) $
-        fetchLatestRelease
-          { authToken
-          , owner: "greglook"
-          , repo: "cljstyle"
-          }
+  let fetchedLatestVersion = fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
   version <- specifiedVersion <|> fetchedLatestVersion
   usingCache version <|> newlyInstallBin version
 

@@ -3,4 +3,5 @@
 /output
 /.psc-ide-port
 /.psci_modules
+/.purs-repl
 /src/**/*.js

@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "tsc && spago build --watch",
     "compile": "tsc && spago build",
-    "bundle": "esbuild --platform=node --bundle --minify src/bootstrap.js --outfile=dist/setup-cljstyle.js",
+    "bundle": "esbuild --platform=node --target=node12 --bundle --minify src/bootstrap.js --outfile=dist/setup-cljstyle.js",
     "build": "pnpm compile && pnpm bundle",
     "lint": "purs-tidy check src test",
     "format": "purs-tidy format-in-place src test",

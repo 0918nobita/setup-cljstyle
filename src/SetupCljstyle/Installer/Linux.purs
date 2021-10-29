@@ -2,19 +2,17 @@ module SetupCljstyle.Installer.Linux
   ( installBin
   ) where
 
-import Control.Monad.Except (catchError)
-import Effect (Effect)
-import Effect.Aff (Aff, launchAff_)
+import Control.Monad.Except.Trans (ExceptT, withExceptT)
+import Data.Maybe (Maybe(..))
+import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (error)
 import GitHub.Actions.Core (addPath)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Milkis (URL(..))
 import Node.Os (homedir)
 import Node.Path (concat)
-import Node.Process (exit)
 import Prelude
-import SetupCljstyle.Types (Version(..))
+import SetupCljstyle.Types (ErrorMessage(..), Version(..))
 
 downloadUrl :: Version -> URL
 downloadUrl (Version version) =
@@ -24,37 +22,24 @@ downloadUrl (Version version) =
     <> version
     <> "_linux.tar.gz"
 
-downloadTar :: Version -> Aff String
+downloadTar :: Version -> ExceptT ErrorMessage Aff String
 downloadTar version =
   let
-    url = downloadUrl version
-
-    tryDownloadTar = downloadTool url
+    URL url = downloadUrl version
+    tryDownloadTar = downloadTool { url, auth: Nothing, dest: Nothing }
   in
-    catchError
-      tryDownloadTar
-      ( \_ ->
-          liftEffect do
-            error $ "Failed to download " <> show url
-            exit 1
-      )
+    tryDownloadTar # withExceptT (\_ -> ErrorMessage $ "Failed to download " <> url)
 
-extractCljstyleTar :: String -> String -> Aff String
+extractCljstyleTar :: String -> String -> ExceptT ErrorMessage Aff String
 extractCljstyleTar tarPath binDir =
-  catchError
-    (extractTar tarPath binDir)
-    ( \_ ->
-        liftEffect do
-          error $ "Failed to extract " <> tarPath
-          exit 1
-    )
+  extractTar { file: tarPath, dest: Just binDir, flags: Nothing }
+    # withExceptT (\_ -> ErrorMessage $ "Failed to extract " <> tarPath)
 
-installBin :: Version -> Effect Unit
+installBin :: Version -> ExceptT ErrorMessage Aff Unit
 installBin version = do
-  binDir <- homedir # map (\d -> concat [ d, "bin" ])
-
-  launchAff_ do
-    tarPath <- downloadTar version
-    extractedDir <- extractCljstyleTar tarPath binDir
-    _ <- cacheDir extractedDir "cljstyle" version
-    liftEffect $ addPath extractedDir
+  binDir <- liftEffect $ homedir # map (\d -> concat [ d, "bin" ])
+  tarPath <- downloadTar version
+  extractedDir <- extractCljstyleTar tarPath binDir
+  _ <- cacheDir { sourceDir: extractedDir, tool: "cljstyle", version: show version, arch: Nothing }
+    # withExceptT (\_ -> ErrorMessage $ "Failed to cache " <> extractedDir)
+  liftEffect $ addPath extractedDir

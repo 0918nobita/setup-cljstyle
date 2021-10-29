@@ -22,6 +22,7 @@ jobs:
       - uses: ./
         with:
           cljstyle-version: "0.15.0"
+      - run: "ls \"D:\\cljstyle\""
       - run: cljstyle version
 
   use-on-macOS:

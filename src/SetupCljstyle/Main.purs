@@ -5,10 +5,12 @@ module SetupCljstyle.Main
 import Prelude
 
 import Control.Alt ((<|>))
-import Control.Monad.Except (ExceptT(..), catchError, except, mapExceptT, runExceptT, withExceptT)
+import Control.Monad.Error.Class (throwError)
+import Control.Monad.Except (ExceptT, catchError, except, mapExceptT, runExceptT, withExceptT)
 import Control.Monad.Trans.Class (lift)
 import Data.Either (Either(..))
 import Data.EitherR (fmapL)
+import Data.Maybe (Maybe(..))
 import Data.String (null)
 import Data.String.Regex (Regex, regex, test)
 import Data.String.Regex.Flags (noFlags)
@@ -16,7 +18,7 @@ import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (error)
-import GitHub.Actions.Core (addPath, getOptionalInput)
+import GitHub.Actions.Core (addPath, getInput)
 import GitHub.Actions.ToolCache (find)
 import GitHub.RestApi.Releases (fetchLatestRelease)
 import Node.Process (exit)
@@ -24,45 +26,49 @@ import Node.ProcessExt (platform)
 import SetupCljstyle.Installer (installBin)
 import SetupCljstyle.Types (ErrorMessage(..), Version(..))
 
-getVerOption :: Effect String
-getVerOption = getOptionalInput "cljstyle-version"
+getVerOption :: ExceptT ErrorMessage Effect String
+getVerOption =
+  getInput { name: "cljstyle-version", options: Nothing }
+    # withExceptT (\_ -> ErrorMessage "Failed to get `cljstyle-version` input")
 
-getAuthToken :: Effect String
-getAuthToken = getOptionalInput "token"
+getAuthToken :: ExceptT ErrorMessage Effect String
+getAuthToken =
+  getInput { name: "token", options: Nothing }
+    # withExceptT (\_ -> ErrorMessage "Failed to get `token` input")
 
 versionRegex :: Either ErrorMessage Regex
 versionRegex = regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags # fmapL ErrorMessage
 
 tryGetSpecifiedVer :: ExceptT ErrorMessage Aff Version
-tryGetSpecifiedVer =
-  mapExceptT liftEffect $ ExceptT do
-    version <- getVerOption
-    pure
-      if null version then
-        Left $ ErrorMessage "Version is not specified"
-      else do
-        verRegex <- versionRegex
-        if test verRegex version then
-          Right $ Version version
-        else
-          Left $ ErrorMessage "The format of cljstyle-version is invalid."
+tryGetSpecifiedVer = do
+  version <- mapExceptT liftEffect getVerOption
+  except
+    if null version then
+      Left $ ErrorMessage "Version is not specified"
+    else do
+      verRegex <- versionRegex
+      if test verRegex version then
+        Right $ Version version
+      else
+        Left $ ErrorMessage "The format of cljstyle-version is invalid."
 
 tryGetLatestVer :: ExceptT ErrorMessage Aff Version
 tryGetLatestVer = do
-  authToken <- liftEffect getAuthToken
+  authToken <- mapExceptT liftEffect getAuthToken
   fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
 
 tryUseCache :: Version -> ExceptT ErrorMessage Aff Unit
-tryUseCache version =
+tryUseCache (Version version) =
   mapExceptT liftEffect do
-    cachePath <- find "cljstyle" version # withExceptT (\_ -> ErrorMessage "Cache not found")
-    lift $ addPath cachePath
+    cachePath <- find { toolName: "cljstyle", versionSpec: version, arch: Nothing } # withExceptT (\_ -> ErrorMessage "Cache not found")
+    case cachePath of
+      Just p -> lift $ addPath p
+      Nothing -> throwError $ ErrorMessage ""
 
 tryInstallBin :: Version -> ExceptT ErrorMessage Aff Unit
-tryInstallBin version =
-  mapExceptT liftEffect do
-    p <- except platform # withExceptT (\_ -> ErrorMessage "Failed to identify platform")
-    lift $ installBin p version
+tryInstallBin version = do
+  p <- except platform # withExceptT (\_ -> ErrorMessage "Failed to identify platform")
+  installBin p version
 
 mainAff :: ExceptT ErrorMessage Aff Unit
 mainAff = do

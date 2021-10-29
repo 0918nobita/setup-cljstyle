@@ -1,7 +1,6 @@
 { name = "setup-cljstyle"
 , dependencies =
   [ "aff"
-  , "aff-promise"
   , "argonaut"
   , "console"
   , "control"
@@ -9,6 +8,7 @@
   , "either"
   , "errors"
   , "foreign-object"
+  , "github-actions-toolkit"
   , "maybe"
   , "milkis"
   , "node-buffer"

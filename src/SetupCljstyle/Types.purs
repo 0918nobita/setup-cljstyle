@@ -2,14 +2,12 @@ module SetupCljstyle.Types where
 
 import Prelude
 
-newtype Version
-  = Version String
+newtype Version = Version String
 
 instance showVersion :: Show Version where
   show (Version v) = v
 
-newtype ErrorMessage
-  = ErrorMessage String
+newtype ErrorMessage = ErrorMessage String
 
 instance eqErrorMessage :: Eq ErrorMessage where
   eq (ErrorMessage a) (ErrorMessage b) = a == b

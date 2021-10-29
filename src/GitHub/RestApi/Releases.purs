@@ -13,14 +13,13 @@ import Milkis as M
 import Milkis.Impl.Node (nodeFetch)
 import SetupCljstyle.Types (Version(..), ErrorMessage(..))
 
-type FetchLatestReleaseArgs
-  = { authToken :: String
-    , owner :: String
-    , repo :: String
-    }
+type FetchLatestReleaseArgs =
+  { authToken :: String
+  , owner :: String
+  , repo :: String
+  }
 
-type Release
-  = { tag_name :: String }
+type Release = { tag_name :: String }
 
 fetch :: M.Fetch
 fetch = M.fetch nodeFetch

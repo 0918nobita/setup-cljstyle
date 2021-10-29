@@ -10,7 +10,5 @@ import SetupCljstyle.Types (Version)
 
 installBin :: Platform -> Version -> Effect Unit
 installBin Win32 = Win32.installBin
-
 installBin Darwin = Darwin.installBin
-
 installBin _ = Linux.installBin

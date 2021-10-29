@@ -32,42 +32,42 @@ getAuthToken = getOptionalInput "token"
 versionRegex :: Either ErrorMessage Regex
 versionRegex = regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags # fmapL ErrorMessage
 
-specifiedVersion :: ExceptT ErrorMessage Aff Version
-specifiedVersion =
-  mapExceptT liftEffect
-    $ ExceptT do
-        version <- getVerOption
-        pure
-          if null version then
-            Left $ ErrorMessage "Version is not specified"
-          else do
-            verRegex <- versionRegex
-            if test verRegex version then
-              Right $ Version version
-            else
-              Left $ ErrorMessage "The format of cljstyle-version is invalid."
+tryGetSpecifiedVer :: ExceptT ErrorMessage Aff Version
+tryGetSpecifiedVer =
+  mapExceptT liftEffect $ ExceptT do
+    version <- getVerOption
+    pure
+      if null version then
+        Left $ ErrorMessage "Version is not specified"
+      else do
+        verRegex <- versionRegex
+        if test verRegex version then
+          Right $ Version version
+        else
+          Left $ ErrorMessage "The format of cljstyle-version is invalid."
 
-usingCache :: Version -> ExceptT ErrorMessage Aff Unit
-usingCache version =
+tryGetLatestVer :: String -> ExceptT ErrorMessage Aff Version
+tryGetLatestVer authToken = fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
+
+tryUseCache :: Version -> ExceptT ErrorMessage Aff Unit
+tryUseCache version =
   mapExceptT liftEffect do
     cachePath <- find "cljstyle" version # withExceptT (\_ -> ErrorMessage "Cache not found")
     lift $ addPath cachePath
 
-newlyInstallBin :: Version -> ExceptT ErrorMessage Aff Unit
-newlyInstallBin version =
+tryInstallBin :: Version -> ExceptT ErrorMessage Aff Unit
+tryInstallBin version =
   mapExceptT liftEffect do
     p <- except platform # withExceptT (\_ -> ErrorMessage "Failed to identify platform")
     lift $ installBin p version
 
-handleError :: ErrorMessage -> ExceptT ErrorMessage Aff Unit
-handleError msg = liftEffect $ error (show msg) *> exit 1
-
 mainAff :: String -> ExceptT ErrorMessage Aff Unit
 mainAff authToken = do
-  let
-    fetchedLatestVersion = fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
-  version <- specifiedVersion <|> fetchedLatestVersion
-  usingCache version <|> newlyInstallBin version
+  version <- tryGetSpecifiedVer <|> (tryGetLatestVer authToken)
+  tryUseCache version <|> tryInstallBin version
+
+handleError :: ErrorMessage -> ExceptT ErrorMessage Aff Unit
+handleError msg = liftEffect $ error (show msg) *> exit 1
 
 main :: Effect Unit
 main = do

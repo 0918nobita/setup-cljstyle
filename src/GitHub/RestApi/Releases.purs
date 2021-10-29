@@ -26,14 +26,11 @@ fetch = M.fetch nodeFetch
 
 fetchLatestRelease :: FetchLatestReleaseArgs -> ExceptT ErrorMessage Aff Version
 fetchLatestRelease args = do
-  let
-    url = "https://api.github.com/repos/" <> args.owner <> "/" <> args.repo <> "/releases/latest"
-  res <-
-    lift
-      $ fetch (M.URL url)
-          { method: getMethod
-          , headers: singleton "Authorization" $ "Bearer " <> args.authToken
-          }
+  let url = "https://api.github.com/repos/" <> args.owner <> "/" <> args.repo <> "/releases/latest"
+  res <- lift $ fetch (M.URL url)
+    { method: getMethod
+    , headers: singleton "Authorization" $ "Bearer " <> args.authToken
+    }
   resBody <- lift $ M.text res
   parsed <- except $ jsonParser resBody # fmapL ErrorMessage
   decoded :: Release <- except $ decodeJson parsed # fmapL (ErrorMessage <<< printJsonDecodeError)

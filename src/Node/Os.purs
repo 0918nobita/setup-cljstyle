@@ -1,5 +1,5 @@
 module Node.Os where
 
-import Prelude
+import Effect (Effect)
 
-foreign import homedir :: Unit -> String
+foreign import homedir :: Effect String

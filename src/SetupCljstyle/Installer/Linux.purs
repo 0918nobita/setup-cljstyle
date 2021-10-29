@@ -2,7 +2,6 @@ module SetupCljstyle.Installer.Linux
   ( installBin
   ) where
 
-import Prelude
 import Control.Monad.Except (catchError)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
@@ -14,6 +13,7 @@ import Milkis (URL(..))
 import Node.Os (homedir)
 import Node.Path (concat)
 import Node.Process (exit)
+import Prelude
 import SetupCljstyle.Types (Version(..))
 
 downloadUrl :: Version -> URL
@@ -50,12 +50,11 @@ extractCljstyleTar tarPath binDir =
     )
 
 installBin :: Version -> Effect Unit
-installBin version =
-  let
-    binDir = concat [ homedir unit, "bin" ]
-  in
-    launchAff_ do
-      tarPath <- downloadTar version
-      extractedDir <- extractCljstyleTar tarPath binDir
-      _ <- cacheDir extractedDir "cljstyle" version
-      liftEffect $ addPath extractedDir
+installBin version = do
+  binDir <- homedir # map (\d -> concat [ d, "bin" ])
+
+  launchAff_ do
+    tarPath <- downloadTar version
+    extractedDir <- extractCljstyleTar tarPath binDir
+    _ <- cacheDir extractedDir "cljstyle" version
+    liftEffect $ addPath extractedDir

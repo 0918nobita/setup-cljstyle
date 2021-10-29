@@ -28,7 +28,6 @@ downloadJar :: Version -> Aff String
 downloadJar version =
   let
     url = downloadUrl version
-
     tryDownloadJar = downloadTool url
   in
     catchError
@@ -42,14 +41,15 @@ downloadJar version =
 installBin :: Version -> Effect Unit
 installBin version =
   launchAff_ do
-    let
-      binDir = "D:\\cljstyle"
+    let binDir = "D:\\cljstyle"
     jarPath <- downloadJar version
+
     mv jarPath $ concat [ binDir, "cljstyle-" <> show version <> ".jar" ]
-    let
-      batchFilePath = concat [ binDir, "cljstyle.bat" ]
-    let
-      batchFileContent = "java -jar %~dp0cljstyle-" <> show version <> ".jar %*"
+
+    let batchFilePath = concat [ binDir, "cljstyle.bat" ]
+    let batchFileContent = "java -jar %~dp0cljstyle-" <> show version <> ".jar %*"
     liftEffect $ writeTextFile UTF8 batchFilePath batchFileContent
+
     _ <- cacheDir binDir "cljstyle" version
+
     liftEffect $ addPath binDir

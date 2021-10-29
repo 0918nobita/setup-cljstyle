@@ -24,7 +24,6 @@ downloadTar :: Version -> Aff String
 downloadTar version =
   let
     url = downloadUrl version
-
     tryDownloadTar = downloadTool url
   in
     catchError
@@ -47,11 +46,9 @@ extractCljstyleTar tarPath binDir =
 
 installBin :: Version -> Effect Unit
 installBin version =
-  let
-    binDir = "/usr/local/bin"
-  in
-    launchAff_ do
-      tarPath <- downloadTar version
-      extractedDir <- extractCljstyleTar tarPath binDir
-      _ <- cacheDir extractedDir "cljstyle" version
-      liftEffect $ addPath extractedDir
+  launchAff_ do
+    let binDir = "/usr/local/bin"
+    tarPath <- downloadTar version
+    extractedDir <- extractCljstyleTar tarPath binDir
+    _ <- cacheDir extractedDir "cljstyle" version
+    liftEffect $ addPath extractedDir

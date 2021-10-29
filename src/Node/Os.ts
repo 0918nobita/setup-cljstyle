@@ -1,5 +1,3 @@
 import { homedir } from 'os';
 
-export = {
-  homedir,
-};
+export = { homedir };

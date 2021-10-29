@@ -3,6 +3,7 @@ module SetupCljstyle.Main
   ) where
 
 import Prelude
+
 import Control.Alt ((<|>))
 import Control.Monad.Except (ExceptT(..), catchError, except, mapExceptT, runExceptT, withExceptT)
 import Control.Monad.Trans.Class (lift)
@@ -46,8 +47,10 @@ tryGetSpecifiedVer =
         else
           Left $ ErrorMessage "The format of cljstyle-version is invalid."
 
-tryGetLatestVer :: String -> ExceptT ErrorMessage Aff Version
-tryGetLatestVer authToken = fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
+tryGetLatestVer :: ExceptT ErrorMessage Aff Version
+tryGetLatestVer = do
+  authToken <- liftEffect getAuthToken
+  fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
 
 tryUseCache :: Version -> ExceptT ErrorMessage Aff Unit
 tryUseCache version =
@@ -61,15 +64,13 @@ tryInstallBin version =
     p <- except platform # withExceptT (\_ -> ErrorMessage "Failed to identify platform")
     lift $ installBin p version
 
-mainAff :: String -> ExceptT ErrorMessage Aff Unit
-mainAff authToken = do
-  version <- tryGetSpecifiedVer <|> (tryGetLatestVer authToken)
+mainAff :: ExceptT ErrorMessage Aff Unit
+mainAff = do
+  version <- tryGetSpecifiedVer <|> tryGetLatestVer
   tryUseCache version <|> tryInstallBin version
 
 handleError :: ErrorMessage -> ExceptT ErrorMessage Aff Unit
 handleError msg = liftEffect $ error (show msg) *> exit 1
 
 main :: Effect Unit
-main = do
-  authToken <- getAuthToken
-  launchAff_ $ runExceptT $ catchError (mainAff authToken) handleError
+main = launchAff_ $ runExceptT $ catchError mainAff handleError

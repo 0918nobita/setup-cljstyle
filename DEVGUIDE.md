@@ -1,9 +1,19 @@
 # Development Guide
 
-## Build
+## Requirements
+
+- [pnpm](https://pnpm.io)
+- [zephyr](https://github.com/coot/zephyr)
+
+## Install dependencies
 
 ```bash
 pnpm install
+```
+
+## Build
+
+```bash
 pnpm build
 ```
 

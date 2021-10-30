@@ -14,7 +14,7 @@ import Data.String.Regex.Flags (noFlags)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (error)
+import Effect.Class.Console (error, log)
 import GitHub.Actions.Core (addPath, getInput)
 import GitHub.Actions.ToolCache (find)
 import GitHub.RestApi.Releases (fetchLatestRelease)
@@ -39,7 +39,9 @@ versionRegex = regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags #
 
 tryGetSpecifiedVer :: ExceptT ErrorMessage Aff Version
 tryGetSpecifiedVer = do
+  liftEffect $ log "Attempting to get specified version"
   version <- mapExceptT liftEffect getVerOption
+  liftEffect $ log $ "Specificed version: " <> version
   except
     if null version then
       Left $ ErrorMessage "Version is not specified"
@@ -52,6 +54,7 @@ tryGetSpecifiedVer = do
 
 tryGetLatestVer :: ExceptT ErrorMessage Aff Version
 tryGetLatestVer = do
+  liftEffect $ log "Attempting to get the latest version"
   authToken <- mapExceptT liftEffect getAuthToken
   fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
 
@@ -66,9 +69,15 @@ tryUseCache (Version version) =
 
 mainAff :: ExceptT ErrorMessage Aff Unit
 mainAff = do
+  liftEffect $ log "::group::🔖 Determining the version of cljstyle installed"
   version <- tryGetSpecifiedVer <|> tryGetLatestVer
+  liftEffect do
+    log $ "Determined version: " <> show version
+    log "::endgroup::"
+    log $ "::group::➕ Installing cljstyle " <> show version
   cachePath <- tryUseCache version <|> tryInstallBin version
   liftEffect $ addPath cachePath
+  log "::endgroup::"
 
 handleError :: ErrorMessage -> ExceptT ErrorMessage Aff Unit
 handleError msg = liftEffect $ error (show msg) *> exit 1

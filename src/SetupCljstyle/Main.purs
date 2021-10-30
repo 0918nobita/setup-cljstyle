@@ -22,8 +22,7 @@ import GitHub.Actions.Core (addPath, getInput)
 import GitHub.Actions.ToolCache (find)
 import GitHub.RestApi.Releases (fetchLatestRelease)
 import Node.Process (exit)
-import Node.ProcessExt (platform)
-import SetupCljstyle.Installer (installBin)
+import SetupCljstyle.Installer (tryInstallBin)
 import SetupCljstyle.Types (ErrorMessage(..), Version(..))
 
 getVerOption :: ExceptT ErrorMessage Effect String
@@ -60,15 +59,11 @@ tryGetLatestVer = do
 tryUseCache :: Version -> ExceptT ErrorMessage Aff Unit
 tryUseCache (Version version) =
   mapExceptT liftEffect do
-    cachePath <- find { toolName: "cljstyle", versionSpec: version, arch: Nothing } # withExceptT (\_ -> ErrorMessage "Cache not found")
+    cachePath <- find { toolName: "cljstyle", versionSpec: version, arch: Nothing }
+      # withExceptT (\_ -> ErrorMessage "Cache not found")
     case cachePath of
       Just p -> lift $ addPath p
       Nothing -> throwError $ ErrorMessage ""
-
-tryInstallBin :: Version -> ExceptT ErrorMessage Aff Unit
-tryInstallBin version = do
-  p <- except platform # withExceptT (\_ -> ErrorMessage "Failed to identify platform")
-  installBin p version
 
 mainAff :: ExceptT ErrorMessage Aff Unit
 mainAff = do

@@ -7,10 +7,9 @@ import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import GitHub.Actions.Core (addPath)
+import GitHub.Actions.IO (mkdirP)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Milkis (URL(..))
-import Node.Os (homedir)
-import Node.Path (concat)
 import Prelude
 import SetupCljstyle.Types (ErrorMessage(..), Version(..))
 
@@ -37,7 +36,8 @@ extractCljstyleTar tarPath binDir =
 
 installBin :: Version -> ExceptT ErrorMessage Aff Unit
 installBin version = do
-  binDir <- liftEffect $ homedir # map (\d -> concat [ d, "bin" ])
+  let binDir = "/home/runner/.local/bin"
+  mkdirP { fsPath: binDir } # withExceptT (\_ -> ErrorMessage "Failed to make `~/.local/bin` directory")
   tarPath <- downloadTar version
   extractedDir <- extractCljstyleTar tarPath binDir
   _ <- cacheDir { sourceDir: extractedDir, tool: "cljstyle", version: show version, arch: Nothing }

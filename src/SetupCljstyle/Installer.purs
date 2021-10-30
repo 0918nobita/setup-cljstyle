@@ -1,15 +1,21 @@
 module SetupCljstyle.Installer where
 
+import Control.Monad.Error.Class (throwError)
 import Control.Monad.Except.Trans (ExceptT)
+import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Node.Platform (Platform(Win32, Darwin))
+import Node.Process as Process
 import Prelude
 import SetupCljstyle.Installer.Win32 as Win32
 import SetupCljstyle.Installer.Darwin as Darwin
 import SetupCljstyle.Installer.Linux as Linux
-import SetupCljstyle.Types (ErrorMessage, Version)
+import SetupCljstyle.Types (ErrorMessage(..), Version)
 
-installBin :: Platform -> Version -> ExceptT ErrorMessage Aff Unit
-installBin Win32 = Win32.installBin
-installBin Darwin = Darwin.installBin
-installBin _ = Linux.installBin
+tryInstallBin :: Version -> ExceptT ErrorMessage Aff Unit
+tryInstallBin version =
+  case Process.platform of
+    Just Win32 -> Win32.installBin version
+    Just Darwin -> Darwin.installBin version
+    Just _ -> Linux.installBin version
+    Nothing -> throwError $ ErrorMessage "Failed to identify platform"

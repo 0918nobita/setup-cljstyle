@@ -5,7 +5,6 @@ module SetupCljstyle.Main
 import Control.Alt ((<|>))
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.Except (ExceptT, catchError, except, mapExceptT, runExceptT, withExceptT)
-import Control.Monad.Trans.Class (lift)
 import Data.Either (Either(..))
 import Data.EitherR (fmapL)
 import Data.Maybe (Maybe(..))
@@ -19,6 +18,7 @@ import Effect.Class.Console (error)
 import GitHub.Actions.Core (addPath, getInput)
 import GitHub.Actions.ToolCache (find)
 import GitHub.RestApi.Releases (fetchLatestRelease)
+import Node.Path (FilePath)
 import Node.Process (exit)
 import Prelude
 import SetupCljstyle.Installer (tryInstallBin)
@@ -55,19 +55,20 @@ tryGetLatestVer = do
   authToken <- mapExceptT liftEffect getAuthToken
   fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
 
-tryUseCache :: Version -> ExceptT ErrorMessage Aff Unit
+tryUseCache :: Version -> ExceptT ErrorMessage Aff FilePath
 tryUseCache (Version version) =
   mapExceptT liftEffect do
     cachePath <- find { toolName: "cljstyle", versionSpec: version, arch: Nothing }
       # withExceptT (\_ -> ErrorMessage "Cache not found")
     case cachePath of
-      Just p -> lift $ addPath p
-      Nothing -> throwError $ ErrorMessage ""
+      Just p -> except $ Right p
+      Nothing -> throwError $ ErrorMessage "Failed to get cache path"
 
 mainAff :: ExceptT ErrorMessage Aff Unit
 mainAff = do
   version <- tryGetSpecifiedVer <|> tryGetLatestVer
-  tryUseCache version <|> tryInstallBin version
+  cachePath <- tryUseCache version <|> tryInstallBin version
+  liftEffect $ addPath cachePath
 
 handleError :: ErrorMessage -> ExceptT ErrorMessage Aff Unit
 handleError msg = liftEffect $ error (show msg) *> exit 1

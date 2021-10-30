@@ -4,6 +4,7 @@ import Control.Monad.Error.Class (throwError)
 import Control.Monad.Except.Trans (ExceptT)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
+import Node.Path (FilePath)
 import Node.Platform (Platform(Win32, Darwin))
 import Node.Process as Process
 import Prelude
@@ -12,7 +13,7 @@ import SetupCljstyle.Installer.Darwin as Darwin
 import SetupCljstyle.Installer.Linux as Linux
 import SetupCljstyle.Types (ErrorMessage(..), Version)
 
-tryInstallBin :: Version -> ExceptT ErrorMessage Aff Unit
+tryInstallBin :: Version -> ExceptT ErrorMessage Aff FilePath
 tryInstallBin version =
   case Process.platform of
     Just Win32 -> Win32.installBin version

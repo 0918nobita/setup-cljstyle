@@ -1,16 +1,16 @@
 module SetupCljstyle.Installer.Win32 where
 
-import Control.Monad.Except.Trans (ExceptT, withExceptT)
+import Control.Monad.Except.Trans (ExceptT, except, withExceptT)
+import Data.Either (Either(Right))
 import Data.Maybe (Maybe(Nothing))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import GitHub.Actions.Core (addPath)
 import GitHub.Actions.IO (mv)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool)
 import Milkis (URL(..))
 import Node.Encoding (Encoding(UTF8))
 import Node.FS.Sync (writeTextFile)
-import Node.Path (concat)
+import Node.Path (FilePath, concat)
 import Prelude
 import SetupCljstyle.Types (ErrorMessage(..), Version(..))
 
@@ -22,7 +22,7 @@ downloadUrl (Version version) =
     <> version
     <> ".jar"
 
-downloadJar :: Version -> ExceptT ErrorMessage Aff String
+downloadJar :: Version -> ExceptT ErrorMessage Aff FilePath
 downloadJar version =
   let
     URL url = downloadUrl version
@@ -30,7 +30,7 @@ downloadJar version =
   in
     tryDownloadJar # withExceptT (\_ -> ErrorMessage $ "Failed to download " <> url)
 
-installBin :: Version -> ExceptT ErrorMessage Aff Unit
+installBin :: Version -> ExceptT ErrorMessage Aff FilePath
 installBin version = do
   let binDir = "D:\\cljstyle"
   jarPath <- downloadJar version
@@ -46,4 +46,4 @@ installBin version = do
   _ <- cacheDir { sourceDir: binDir, tool: "cljstyle", version: show version, arch: Nothing }
     # withExceptT (\_ -> ErrorMessage $ "Failed to cache " <> binDir)
 
-  liftEffect $ addPath binDir
+  except $ Right binDir

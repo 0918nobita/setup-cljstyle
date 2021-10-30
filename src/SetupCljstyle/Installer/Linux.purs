@@ -2,14 +2,14 @@ module SetupCljstyle.Installer.Linux
   ( installBin
   ) where
 
-import Control.Monad.Except.Trans (ExceptT, withExceptT)
+import Control.Monad.Except.Trans (ExceptT, except, withExceptT)
+import Data.Either (Either(Right))
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
-import Effect.Class (liftEffect)
-import GitHub.Actions.Core (addPath)
 import GitHub.Actions.IO (mkdirP)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Milkis (URL(..))
+import Node.Path (FilePath)
 import Prelude
 import SetupCljstyle.Types (ErrorMessage(..), Version(..))
 
@@ -21,7 +21,7 @@ downloadUrl (Version version) =
     <> version
     <> "_linux.tar.gz"
 
-downloadTar :: Version -> ExceptT ErrorMessage Aff String
+downloadTar :: Version -> ExceptT ErrorMessage Aff FilePath
 downloadTar version =
   let
     URL url = downloadUrl version
@@ -34,7 +34,7 @@ extractCljstyleTar tarPath binDir =
   extractTar { file: tarPath, dest: Just binDir, flags: Nothing }
     # withExceptT (\_ -> ErrorMessage $ "Failed to extract " <> tarPath)
 
-installBin :: Version -> ExceptT ErrorMessage Aff Unit
+installBin :: Version -> ExceptT ErrorMessage Aff FilePath
 installBin version = do
   let binDir = "/home/runner/.local/bin"
   mkdirP { fsPath: binDir } # withExceptT (\_ -> ErrorMessage "Failed to make `~/.local/bin` directory")
@@ -42,4 +42,4 @@ installBin version = do
   extractedDir <- extractCljstyleTar tarPath binDir
   _ <- cacheDir { sourceDir: extractedDir, tool: "cljstyle", version: show version, arch: Nothing }
     # withExceptT (\_ -> ErrorMessage $ "Failed to cache " <> extractedDir)
-  liftEffect $ addPath extractedDir
+  except $ Right extractedDir

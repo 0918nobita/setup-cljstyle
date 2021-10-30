@@ -1,6 +1,5 @@
 module SetupCljstyle.Installer.Win32 where
 
-import Prelude
 import Control.Monad.Except.Trans (ExceptT, withExceptT)
 import Data.Maybe (Maybe(Nothing))
 import Effect.Aff (Aff)
@@ -12,6 +11,7 @@ import Milkis (URL(..))
 import Node.Encoding (Encoding(UTF8))
 import Node.FS.Sync (writeTextFile)
 import Node.Path (concat)
+import Prelude
 import SetupCljstyle.Types (ErrorMessage(..), Version(..))
 
 downloadUrl :: Version -> URL

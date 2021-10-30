@@ -2,8 +2,6 @@ module SetupCljstyle.Main
   ( main
   ) where
 
-import Prelude
-
 import Control.Alt ((<|>))
 import Control.Monad.Error.Class (throwError)
 import Control.Monad.Except (ExceptT, catchError, except, mapExceptT, runExceptT, withExceptT)
@@ -22,6 +20,7 @@ import GitHub.Actions.Core (addPath, getInput)
 import GitHub.Actions.ToolCache (find)
 import GitHub.RestApi.Releases (fetchLatestRelease)
 import Node.Process (exit)
+import Prelude
 import SetupCljstyle.Installer (tryInstallBin)
 import SetupCljstyle.Types (ErrorMessage(..), Version(..))
 

@@ -2,7 +2,6 @@ module GitHub.RestApi.Releases
   ( fetchLatestRelease
   ) where
 
-import Prelude
 import Control.Monad.Except (ExceptT, except, lift)
 import Data.Argonaut (decodeJson, jsonParser, printJsonDecodeError)
 import Data.EitherR (fmapL)
@@ -11,6 +10,7 @@ import Foreign.Object (singleton)
 import Milkis (getMethod)
 import Milkis as M
 import Milkis.Impl.Node (nodeFetch)
+import Prelude
 import SetupCljstyle.Types (Version(..), ErrorMessage(..))
 
 type FetchLatestReleaseArgs =

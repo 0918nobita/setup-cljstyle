@@ -1,6 +1,5 @@
 module SetupCljstyle.Installer.Darwin where
 
-import Prelude
 import Control.Monad.Except.Trans (ExceptT, withExceptT)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
@@ -8,6 +7,7 @@ import Effect.Class (liftEffect)
 import GitHub.Actions.Core (addPath)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Milkis (URL(..))
+import Prelude
 import SetupCljstyle.Types (ErrorMessage(..), Version(..))
 
 downloadUrl :: Version -> URL

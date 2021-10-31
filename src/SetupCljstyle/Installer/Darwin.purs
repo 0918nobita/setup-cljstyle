@@ -1,4 +1,6 @@
-module SetupCljstyle.Installer.Darwin where
+module SetupCljstyle.Installer.Darwin
+  ( installBin
+  ) where
 
 import Control.Monad.Except.Trans (ExceptT, except, withExceptT)
 import Data.Either (Either(Right))

@@ -26,7 +26,7 @@
 ```yaml
 steps:
   - uses: actions/checkout@v2
-  - uses: 0918nobita/setup-cljstyle@v0.4.2
+  - uses: 0918nobita/setup-cljstyle@v0.4.3
     with:
       cljstyle-version: "0.15.0"
   - run: cljstyle version

@@ -1,12 +1,13 @@
-module SetupCljstyle.Installer.Win32 where
+module SetupCljstyle.Installer.Win32
+  ( installBin
+  ) where
 
 import Control.Monad.Except.Trans (ExceptT, except, withExceptT)
 import Data.Either (Either(Right))
-import Data.Maybe (Maybe(Nothing))
+import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import GitHub.Actions.IO (mv)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool)
 import Milkis (URL(..))
 import Node.Encoding (Encoding(UTF8))
@@ -23,11 +24,16 @@ downloadUrl (Version version) =
     <> version
     <> ".jar"
 
-downloadJar :: Version -> ExceptT ErrorMessage Aff FilePath
+binDir :: String
+binDir = "D:\\cljstyle"
+
+downloadJar :: Version -> ExceptT ErrorMessage Aff Unit
 downloadJar version =
   let
     URL url = downloadUrl version
-    tryDownloadJar = downloadTool { url, auth: Nothing, dest: Nothing }
+    tryDownloadJar =
+      downloadTool { url, auth: Nothing, dest: Just $ concat [ binDir, "cljstyle-" <> show version <> ".jar" ] }
+        *> pure unit
   in
     do
       liftEffect $ log $ "⬇️ Downloading " <> url
@@ -35,13 +41,7 @@ downloadJar version =
 
 installBin :: Version -> ExceptT ErrorMessage Aff FilePath
 installBin version = do
-  let binDir = "D:\\cljstyle"
-  jarPath <- downloadJar version
-
-  let dest = concat [ binDir, "cljstyle-" <> show version <> ".jar" ]
-  liftEffect $ log $ "🚚 Move " <> jarPath <> " to " <> dest
-  mv { source: jarPath, dest, options: Nothing }
-    # withExceptT (\_ -> ErrorMessage $ "Failed to move `cljstyle.jar` to " <> binDir)
+  downloadJar version
 
   let batchFilePath = concat [ binDir, "cljstyle.bat" ]
   liftEffect $ log $ "📝 Write " <> batchFilePath

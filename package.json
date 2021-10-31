@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "compile": "spago build --purs-args '--codegen corefn,js' && zephyr SetupCljstyle.Main.main",
-    "bundle": "esbuild --platform=node --target=node12 --minify --bundle src/bootstrap.js | uglifyjs -c -m -o dist/setup-cljstyle.js",
+    "bundle": "esbuild --platform=node --target=node12 --minify --bundle src/bootstrap.js | uglifyjs -c -m -o setup-cljstyle.js",
     "build": "pnpm compile && pnpm bundle",
     "lint": "purs-tidy check src test",
     "format": "purs-tidy format-in-place src test",

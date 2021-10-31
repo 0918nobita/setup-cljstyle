@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    branches-ignore:
+      - 'release/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }} # needed for triggering the `Use this action` workflow
+      - uses: pnpm/action-setup@v2
+        with:
+          version: "6.19.1"
+          run_install: true
+      - name: Install zephyr
+        run: |
+          wget --quiet https://github.com/coot/zephyr/releases/download/c074270/Linux.tar.gz
+          tar -zxvf Linux.tar.gz
+          echo "$(realpath ./zephyr)" >> $GITHUB_PATH
+      - run: zephyr --version
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Build
+        run: pnpm build
+      - name: Commit and push setup-cljstyle.js
+        run: |
+          BRANCH_NAME="release/${GITHUB_REF#refs/heads/}"
+          git checkout -b $BRANCH_NAME
+          git add -f setup-cljstyle.js
+          git status
+          git commit -m build
+          git push origin $BRANCH_NAME -f

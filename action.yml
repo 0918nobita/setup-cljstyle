@@ -12,4 +12,4 @@ inputs:
     description: The version of cljstyle
 runs:
   using: node12
-  main: dist/setup-cljstyle.js
+  main: setup-cljstyle.js

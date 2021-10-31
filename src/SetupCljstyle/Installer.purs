@@ -5,7 +5,7 @@ import Control.Monad.Except.Trans (ExceptT)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Effect.Console (info)
+import Effect.Console (log)
 import Node.Path (FilePath)
 import Node.Platform (Platform(Win32, Darwin))
 import Node.Process as Process
@@ -19,12 +19,12 @@ tryInstallBin :: Version -> ExceptT ErrorMessage Aff FilePath
 tryInstallBin version =
   case Process.platform of
     Just Win32 -> do
-      liftEffect $ info "platform: win32"
+      liftEffect $ log "🪟 Detected platform: Win32"
       Win32.installBin version
     Just Darwin -> do
-      liftEffect $ info "platform: darwin"
+      liftEffect $ log "🍎 Detected platform: Darwin"
       Darwin.installBin version
     Just _ -> do
-      liftEffect $ info "platform: other"
+      liftEffect $ log "🐧 Detected platform: Linux"
       Linux.installBin version
     Nothing -> throwError $ ErrorMessage "Failed to identify platform"

@@ -7,7 +7,7 @@ import Data.Either (Either(Right))
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
-import Effect.Console (log)
+import Effect.Class.Console (log)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool)
 import Milkis (URL(..))
 import Node.Encoding (Encoding(UTF8))
@@ -28,28 +28,26 @@ binDir :: String
 binDir = "D:\\cljstyle"
 
 downloadJar :: Version -> ExceptT ErrorMessage Aff Unit
-downloadJar version =
+downloadJar version = do
   let
     URL url = downloadUrl version
     tryDownloadJar =
       downloadTool { url, auth: Nothing, dest: Just $ concat [ binDir, "cljstyle-" <> show version <> ".jar" ] }
         *> pure unit
-  in
-    do
-      liftEffect $ log $ "⬇️ Downloading " <> url
-      tryDownloadJar # withExceptT (\_ -> ErrorMessage $ "Failed to download " <> url)
+  log $ "⬇️ Downloading " <> url
+  tryDownloadJar # withExceptT (\_ -> ErrorMessage $ "Failed to download " <> url)
 
 installBin :: Version -> ExceptT ErrorMessage Aff FilePath
 installBin version = do
   downloadJar version
 
   let batchFilePath = concat [ binDir, "cljstyle.bat" ]
-  liftEffect $ log $ "📝 Write " <> batchFilePath
+  log $ "📝 Write " <> batchFilePath
   let batchFileContent = "java -jar %~dp0cljstyle-" <> show version <> ".jar %*"
   (liftEffect $ writeTextFile UTF8 batchFilePath batchFileContent)
     # withExceptT (\_ -> ErrorMessage $ "Failed to write " <> batchFilePath)
 
-  liftEffect $ log $ "📋 Caching " <> binDir
+  log $ "📋 Caching " <> binDir
   _ <- cacheDir { sourceDir: binDir, tool: "cljstyle", version: show version, arch: Nothing }
     # withExceptT (\_ -> ErrorMessage $ "Failed to cache " <> binDir)
 

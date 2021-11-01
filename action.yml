@@ -10,6 +10,9 @@ inputs:
     default: ${{ github.token }}
   cljstyle-version:
     description: The version of cljstyle
+  run-check:
+    description: If specified, run `cljstyle check` after installation.
+    default: 'false'
 runs:
   using: node12
   main: setup-cljstyle.js

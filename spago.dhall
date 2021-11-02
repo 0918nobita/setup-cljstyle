@@ -13,6 +13,7 @@
   , "maybe"
   , "milkis"
   , "node-buffer"
+  , "node-child-process"
   , "node-fs"
   , "node-path"
   , "node-process"

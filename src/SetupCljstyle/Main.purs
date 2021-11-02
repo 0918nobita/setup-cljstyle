@@ -14,10 +14,11 @@ import Data.String.Regex.Flags (noFlags)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (errorShow, log)
+import Effect.Class.Console (errorShow, log, logShow)
 import GitHub.Actions.Core (addPath, group)
 import GitHub.Actions.ToolCache (find)
 import GitHub.RestApi.Releases (fetchLatestRelease)
+import Node.ChildProcess (defaultExecOptions, exec)
 import Node.Path (FilePath)
 import Node.Process (exit)
 import Prelude
@@ -64,7 +65,6 @@ group' name = mapExceptT (\aff -> group { fn: aff, name })
 mainAff :: ExceptT ErrorMessage Aff Unit
 mainAff = do
   runCheck <- mapExceptT liftEffect runCheckInput
-  log $ "run-check: " <> show runCheck
 
   version <- group' "🔖 Determining the version of cljstyle installed" do
     version <- tryGetSpecifiedVer <|> tryGetLatestVer
@@ -74,6 +74,11 @@ mainAff = do
   group' ("➕ Installing cljstyle " <> show version) do
     cachePath <- tryUseCache version <|> tryInstallBin version
     liftEffect $ addPath cachePath
+
+  if runCheck then do
+    _ <- group' "▶️ Run `cljstyle check`" $ liftEffect $ exec "cljstyle check" defaultExecOptions (\res -> logShow res.error)
+    pure unit
+  else mempty
 
 handleError :: ErrorMessage -> ExceptT ErrorMessage Aff Unit
 handleError msg = do

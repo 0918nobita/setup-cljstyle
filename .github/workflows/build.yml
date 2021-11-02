@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
       - uses: actions/checkout@v2
         with:
           token: ${{ secrets.PAT }} # needed for triggering the `Use this action` workflow
@@ -22,17 +26,16 @@ jobs:
           tar -zxvf Linux.tar.gz
           echo "$(realpath ./zephyr)" >> $GITHUB_PATH
       - run: zephyr --version
-      - name: Configure git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
       - name: Build
         run: pnpm build
       - name: Commit and push setup-cljstyle.js
         run: |
           BRANCH_NAME="release/${GITHUB_REF#refs/heads/}"
           git checkout -b $BRANCH_NAME
-          git add -f setup-cljstyle.js
-          git status
-          git commit -m build
+          find . -maxdepth 1 \
+            \( -type d -o -type f \) \
+            ! \( -name "." -o -name ".git" -o -name ".github" -o -name "setup-cljstyle.js" -o -name "action.yml" \) \
+            | xargs rm -rf
+          git add .
+          git commit -m ":robot: Build setup-cljstyle action"
           git push origin $BRANCH_NAME -f

@@ -2,8 +2,9 @@ module SetupCljstyle.Installer.Linux
   ( installBin
   ) where
 
-import Control.Monad.Except.Trans (ExceptT, except, withExceptT)
-import Data.Either (Either(Right))
+import Control.Monad.Except (ExceptT, withExceptT)
+import Control.Monad.Reader (ReaderT, ask, asks)
+import Control.Monad.Trans.Class (lift)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Effect.Class.Console (log)
@@ -12,7 +13,7 @@ import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Milkis (URL(..))
 import Node.Path (FilePath)
 import Prelude
-import SetupCljstyle.Types (ErrorMessage(..), Version(..))
+import SetupCljstyle.Types (SingleError(..), Version(..))
 
 downloadUrl :: Version -> URL
 downloadUrl (Version version) =
@@ -22,31 +23,34 @@ downloadUrl (Version version) =
     <> version
     <> "_linux.tar.gz"
 
-downloadTar :: Version -> ExceptT ErrorMessage Aff FilePath
-downloadTar version = do
-  let
-    URL url = downloadUrl version
-    tryDownloadTar = downloadTool { url, auth: Nothing, dest: Nothing }
-  log $ "⬇️ Downloading " <> url
-  tryDownloadTar # withExceptT (\_ -> ErrorMessage $ "Failed to download " <> url)
+downloadTar :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
+downloadTar = do
+  URL url <- asks downloadUrl
+  lift do
+    log $ "⬇️ Downloading " <> url
+    downloadTool { url, auth: Nothing, dest: Nothing }
+      # withExceptT \_ -> SingleError $ "Failed to download " <> url
 
-extractCljstyleTar :: FilePath -> FilePath -> ExceptT ErrorMessage Aff FilePath
-extractCljstyleTar tarPath binDir = do
+extractCljstyleTar :: { tarPath :: FilePath, binDir :: FilePath } -> ExceptT (SingleError String) Aff FilePath
+extractCljstyleTar { tarPath, binDir } = do
   log $ "🗃️ Extracting " <> tarPath <> " to " <> binDir
   extractTar { file: tarPath, dest: Just binDir, flags: Nothing }
-    # withExceptT (\_ -> ErrorMessage $ "Failed to extract " <> tarPath)
+    # withExceptT \_ -> SingleError $ "Failed to extract " <> tarPath
 
-installBin :: Version -> ExceptT ErrorMessage Aff FilePath
-installBin version = do
+installBin :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
+installBin = do
   let binDir = "/home/runner/.local/bin"
-  mkdirP { fsPath: binDir } # withExceptT (\_ -> ErrorMessage "Failed to make `~/.local/bin` directory")
+  lift $ mkdirP { fsPath: binDir } # withExceptT \_ -> SingleError "Failed to make `~/.local/bin` directory"
 
-  tarPath <- downloadTar version
+  tarPath <- downloadTar
 
-  extractedDir <- extractCljstyleTar tarPath binDir
+  extractedDir <- lift $ extractCljstyleTar { tarPath, binDir }
 
-  log $ "📋 Caching " <> extractedDir
-  _ <- cacheDir { sourceDir: extractedDir, tool: "cljstyle", version: show version, arch: Nothing }
-    # withExceptT (\_ -> ErrorMessage $ "Failed to cache " <> extractedDir)
+  version <- ask
 
-  except $ Right extractedDir
+  lift do
+    log $ "📋 Caching " <> extractedDir
+    _ <- cacheDir { sourceDir: extractedDir, tool: "cljstyle", version: show version, arch: Nothing }
+      # withExceptT \_ -> SingleError $ "Failed to cache " <> extractedDir
+
+    pure extractedDir

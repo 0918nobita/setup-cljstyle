@@ -1,7 +1,7 @@
 module SetupCljstyle.Installer where
 
-import Control.Monad.Error.Class (throwError)
-import Control.Monad.Except.Trans (ExceptT)
+import Control.Monad.Except (ExceptT, throwError)
+import Control.Monad.Reader (ReaderT)
 import Data.Maybe (Maybe(..))
 import Effect.Aff (Aff)
 import Effect.Class.Console (log)
@@ -12,19 +12,19 @@ import Prelude
 import SetupCljstyle.Installer.Win32 as Win32
 import SetupCljstyle.Installer.Darwin as Darwin
 import SetupCljstyle.Installer.Linux as Linux
-import SetupCljstyle.Types (ErrorMessage(..), Version)
+import SetupCljstyle.Types (SingleError(..), Version)
 
-tryInstallBin :: Version -> ExceptT ErrorMessage Aff FilePath
-tryInstallBin version =
+tryInstallBin :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
+tryInstallBin =
   case Process.platform of
     Just Win32 -> do
       log "🪟 Detected platform: Win32"
-      Win32.installBin version
+      Win32.installBin
     Just Darwin -> do
       log "🍎 Detected platform: Darwin"
-      Darwin.installBin version
+      Darwin.installBin
     Just Linux -> do
       log "🐧 Detected platform: Linux"
-      Linux.installBin version
-    Just _ -> throwError $ ErrorMessage "Unsupported platform"
-    Nothing -> throwError $ ErrorMessage "Failed to identify platform"
+      Linux.installBin
+    Just _ -> throwError $ SingleError "Unsupported platform"
+    Nothing -> throwError $ SingleError "Failed to identify platform"

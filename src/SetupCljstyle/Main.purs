@@ -3,9 +3,10 @@ module SetupCljstyle.Main
   ) where
 
 import Control.Alt ((<|>))
-import Control.Monad.Error.Class (throwError)
-import Control.Monad.Except (ExceptT, catchError, except, mapExceptT, runExceptT, withExceptT)
-import Data.Either (Either(..))
+import Control.Monad.Except (ExceptT, throwError, catchError, except, mapExceptT, runExceptT, withExceptT)
+import Control.Monad.Reader (ReaderT, asks, runReaderT)
+import Control.Monad.Trans.Class (lift)
+import Data.Either (Either)
 import Data.EitherR (fmapL)
 import Data.Maybe (Maybe(..))
 import Data.String (null)
@@ -24,45 +25,46 @@ import Node.Process (exit)
 import Prelude
 import SetupCljstyle.Inputs (authTokenInput, cljstyleVersionInput, runCheckInput)
 import SetupCljstyle.Installer (tryInstallBin)
-import SetupCljstyle.Types (ErrorMessage(..), Version(..))
+import SetupCljstyle.Types (SingleError(..), Version(..))
 
-versionRegex :: Either ErrorMessage Regex
-versionRegex = regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags # fmapL ErrorMessage
+versionRegex :: Either (SingleError String) Regex
+versionRegex = regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags # fmapL SingleError
 
-tryGetSpecifiedVer :: ExceptT ErrorMessage Aff Version
+tryGetSpecifiedVer :: ExceptT (SingleError String) Aff Version
 tryGetSpecifiedVer = do
   log "Attempting to get specified version"
   version <- mapExceptT liftEffect cljstyleVersionInput
   log $ "Specificed version: " <> version
-  except
-    if null version then
-      Left $ ErrorMessage "Version is not specified"
-    else do
-      verRegex <- versionRegex
-      if test verRegex version then
-        Right $ Version version
-      else
-        Left $ ErrorMessage "The format of cljstyle-version is invalid."
+  if null version then
+    throwError $ SingleError "Version is not specified"
+  else do
+    verRegex <- except versionRegex
+    if test verRegex version then
+      pure $ Version version
+    else
+      throwError $ SingleError "The format of cljstyle-version is invalid."
 
-tryGetLatestVer :: ExceptT ErrorMessage Aff Version
+tryGetLatestVer :: ExceptT (SingleError String) Aff Version
 tryGetLatestVer = do
   log "Attempting to get the latest version"
   authToken <- mapExceptT liftEffect authTokenInput
   fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
 
-tryUseCache :: Version -> ExceptT ErrorMessage Aff FilePath
-tryUseCache (Version version) =
-  mapExceptT liftEffect do
-    cachePath <- find { toolName: "cljstyle", versionSpec: version, arch: Nothing }
-      # withExceptT (\_ -> ErrorMessage "Cache not found")
+tryUseCache :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
+tryUseCache = do
+  versionSpec <- asks show
+
+  lift $ mapExceptT liftEffect do
+    cachePath <- find { toolName: "cljstyle", versionSpec, arch: Nothing }
+      # withExceptT \_ -> SingleError "Cache not found"
     case cachePath of
-      Just p -> except $ Right p
-      Nothing -> throwError $ ErrorMessage "Failed to get cache path"
+      Just p -> pure p
+      Nothing -> throwError $ SingleError "Failed to get cache path"
 
 group' :: forall e a. String -> ExceptT e Aff a -> ExceptT e Aff a
-group' name = mapExceptT (\aff -> group { fn: aff, name })
+group' name = mapExceptT \aff -> group { fn: aff, name }
 
-mainAff :: ExceptT ErrorMessage Aff Unit
+mainAff :: ExceptT (SingleError String) Aff Unit
 mainAff = do
   runCheck <- mapExceptT liftEffect runCheckInput
 
@@ -72,15 +74,17 @@ mainAff = do
     pure version
 
   group' ("➕ Installing cljstyle " <> show version) do
-    cachePath <- tryUseCache version <|> tryInstallBin version
+    cachePath <- runReaderT (tryUseCache <|> tryInstallBin) version
     liftEffect $ addPath cachePath
 
   if runCheck then do
-    _ <- group' "▶️ Run `cljstyle check`" $ liftEffect $ exec "cljstyle check" defaultExecOptions (\res -> logShow res.error)
+    _ <- group' "▶️ Run `cljstyle check`"
+      $ liftEffect
+      $ exec "cljstyle check" defaultExecOptions \res -> logShow res.error
     pure unit
   else mempty
 
-handleError :: ErrorMessage -> ExceptT ErrorMessage Aff Unit
+handleError :: forall a b. Show a => SingleError a -> ExceptT b Aff Unit
 handleError msg = do
   errorShow msg
   liftEffect $ exit 1

@@ -7,13 +7,13 @@ newtype Version = Version String
 instance showVersion :: Show Version where
   show (Version v) = v
 
-newtype ErrorMessage = ErrorMessage String
+newtype SingleError a = SingleError a
 
-instance eqErrorMessage :: Eq ErrorMessage where
-  eq (ErrorMessage a) (ErrorMessage b) = a == b
+instance eqSingleError :: Eq a => Eq (SingleError a) where
+  eq (SingleError a) (SingleError b) = a == b
 
-instance showErrorMessage :: Show ErrorMessage where
-  show (ErrorMessage msg) = msg
+instance showSingleError :: Show a => Show (SingleError a) where
+  show (SingleError msg) = show msg
 
-instance semigroupErrMsg :: Semigroup ErrorMessage where
+instance semigroupSingleError :: Semigroup (SingleError a) where
   append _ e = e

@@ -18,7 +18,7 @@ jobs:
           token: ${{ secrets.PAT }} # needed for triggering the `Use this action` workflow
       - uses: pnpm/action-setup@v2
         with:
-          version: "6.19.1"
+          version: "6.20.1"
           run_install: true
       - name: Install zephyr
         run: |
@@ -30,12 +30,12 @@ jobs:
         run: pnpm build
       - name: Commit and push setup-cljstyle.js
         run: |
+          find . -maxdepth 1 \( -type d -o -type f \) ! -name "." \
+            | sed '/LICENSE\|README.md\|DEVGUIDE.md\|.git\|.github\|action.yml\|setup-cljstyle.js/d' \
+            | xargs rm -rf
           BRANCH_NAME="release/${GITHUB_REF#refs/heads/}"
           git checkout -b $BRANCH_NAME
-          find . -maxdepth 1 \
-            \( -type d -o -type f \) \
-            ! \( -name "." -o -name ".git" -o -name ".github" -o -name "setup-cljstyle.js" -o -name "action.yml" \) \
-            | xargs rm -rf
           git add .
+          git add -f setup-cljstyle.js
           git commit -m ":robot: Build setup-cljstyle action"
           git push origin $BRANCH_NAME -f

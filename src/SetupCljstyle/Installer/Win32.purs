@@ -34,14 +34,13 @@ downloadJar = do
   version <- ask
   lift do
     log $ "⬇️ Downloading " <> url
-    _ <-
+    void $
       downloadTool
         { url
         , auth: Nothing
         , dest: Just $ concat [ binDir, "cljstyle-" <> show version <> ".jar" ]
         }
         # withExceptT \_ -> SingleError $ "Failed to download " <> url
-    pure unit
 
 installBin :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
 installBin = do

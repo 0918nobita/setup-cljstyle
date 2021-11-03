@@ -17,6 +17,7 @@
   , "node-fs"
   , "node-path"
   , "node-process"
+  , "node-streams"
   , "prelude"
   , "psci-support"
   , "spec"

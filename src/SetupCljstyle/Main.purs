@@ -15,13 +15,16 @@ import Data.String.Regex.Flags (noFlags)
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (errorShow, log, logShow)
-import GitHub.Actions.Core (addPath, group)
+import Effect.Class.Console (error, errorShow, log)
+import GitHub.Actions.Core (addPath, endGroup, group, startGroup)
 import GitHub.Actions.ToolCache (find)
 import GitHub.RestApi.Releases (fetchLatestRelease)
-import Node.ChildProcess (defaultExecOptions, exec)
+import Node.Buffer as Buf
+import Node.ChildProcess (Exit(Normally), defaultSpawnOptions, onExit, spawn, stderr, stdout)
+import Node.Encoding (Encoding(UTF8))
 import Node.Path (FilePath)
-import Node.Process (exit)
+import Node.Process as Process
+import Node.Stream (onData)
 import Prelude
 import SetupCljstyle.Inputs (authTokenInput, cljstyleVersionInput, runCheckInput)
 import SetupCljstyle.Installer (tryInstallBin)
@@ -77,17 +80,22 @@ mainAff = do
     cachePath <- runReaderT (tryUseCache <|> tryInstallBin) version
     liftEffect $ addPath cachePath
 
-  if runCheck then do
-    _ <- group' "▶️ Run `cljstyle check`"
-      $ liftEffect
-      $ exec "cljstyle check" defaultExecOptions \res -> logShow res.error
-    pure unit
-  else mempty
+  when runCheck do
+    liftEffect do
+      startGroup "▶️ Run `cljstyle check`"
+      cljstyleCheck <- spawn "cljstyle" [ "check", "--verbose" ] defaultSpawnOptions
+      onExit cljstyleCheck \exit -> do
+        endGroup
+        case exit of
+          Normally 0 -> Process.exit 0
+          _ -> Process.exit 1
+      onData (stdout cljstyleCheck) \buf -> Buf.toString UTF8 buf >>= log
+      onData (stderr cljstyleCheck) \buf -> Buf.toString UTF8 buf >>= error
 
 handleError :: forall a b. Show a => SingleError a -> ExceptT b Aff Unit
 handleError msg = do
   errorShow msg
-  liftEffect $ exit 1
+  liftEffect $ Process.exit 1
 
 main :: Effect Unit
 main = launchAff_ $ runExceptT $ catchError mainAff handleError

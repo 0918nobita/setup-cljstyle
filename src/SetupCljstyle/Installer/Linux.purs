@@ -1,5 +1,6 @@
 module SetupCljstyle.Installer.Linux
-  ( installBin
+  ( InstallerForLinux
+  , installer
   ) where
 
 import Control.Monad.Except (ExceptT, withExceptT)
@@ -13,6 +14,7 @@ import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Milkis (URL(..))
 import Node.Path (FilePath)
 import Prelude
+import SetupCljstyle.Installer (class HasInstaller)
 import SetupCljstyle.Types (SingleError(..), Version(..))
 
 downloadUrl :: Version -> URL
@@ -54,3 +56,13 @@ installBin = do
       # withExceptT \_ -> SingleError $ "Failed to cache " <> extractedDir
 
     pure extractedDir
+
+newtype InstallerForLinux = InstallerForLinux
+  { run :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
+  }
+
+instance hasInstallerLinux :: HasInstaller InstallerForLinux where
+  runInstaller (InstallerForLinux { run }) = run
+
+installer :: InstallerForLinux
+installer = InstallerForLinux { run: installBin }

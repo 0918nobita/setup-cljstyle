@@ -1,5 +1,6 @@
 module SetupCljstyle.Installer.Win32
-  ( installBin
+  ( InstallerForWin32
+  , installer
   ) where
 
 import Control.Monad.Trans.Class (lift)
@@ -15,6 +16,7 @@ import Node.Encoding (Encoding(UTF8))
 import Node.FS.Sync (writeTextFile)
 import Node.Path (FilePath, concat)
 import Prelude
+import SetupCljstyle.Installer (class HasInstaller)
 import SetupCljstyle.Types (SingleError(..), Version(..))
 
 downloadUrl :: Version -> URL
@@ -60,3 +62,13 @@ installBin = do
       # withExceptT \_ -> SingleError $ "Failed to cache " <> binDir
 
     pure binDir
+
+newtype InstallerForWin32 = InstallerForWin32
+  { run :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
+  }
+
+instance hasInstallerWin32 :: HasInstaller InstallerForWin32 where
+  runInstaller (InstallerForWin32 { run }) = run
+
+installer :: InstallerForWin32
+installer = InstallerForWin32 { run: installBin }

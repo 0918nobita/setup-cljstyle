@@ -26,9 +26,7 @@
 ```yaml
 steps:
   - uses: actions/checkout@v2
-  - uses: 0918nobita/setup-cljstyle@v0.4.3
-    with:
-      cljstyle-version: "0.15.0"
+  - uses: 0918nobita/setup-cljstyle@v0.5.0
   - run: cljstyle version
   - run: cljstyle check
 ```
@@ -37,11 +35,36 @@ steps:
 
 #### `cljstyle-version`
 
-Optional. If omitted, the latest version of cljstyle will be installed.
+**Optional** If omitted, the latest version of cljstyle will be installed.
+
+Example :
+
+```yaml
+steps:
+  - uses: actions/checkout@v2
+  - uses: 0918nobita/setup-cljstyle@v0.5.0
+    with:
+      cljstyle-version: "0.15.0"
+  - run: cljstyle version # => mvxcvi/cljstyle 0.15.0 (...)
+```
 
 #### `token`
 
-Default is ``${{ github.token }}``.
+**Optional** Default is ``${{ github.token }}``.
+
+#### `run-check`
+
+**Optional** (_default:_ `false`) If specified, run `cljstyle check --verbose` after installing cljstyle.
+
+Example :
+
+```yaml
+steps:
+  - uses: actions/checkout@v2
+  - uses: 0918nobita/setup-cljstyle@v0.5.0
+    with:
+      run-check: true
+```
 
 ## Supported runners
 

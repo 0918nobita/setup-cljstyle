@@ -29,13 +29,13 @@ downloadTar :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
 downloadTar = do
   URL url <- asks downloadUrl
   lift do
-    log $ "⬇️ Downloading " <> url
+    log $ "⬇️ Download " <> url
     downloadTool { url, auth: Nothing, dest: Nothing }
       # withExceptT \_ -> SingleError $ "Failed to download " <> url
 
 extractCljstyleTar :: { tarPath :: FilePath, binDir :: FilePath } -> ExceptT (SingleError String) Aff FilePath
 extractCljstyleTar { tarPath, binDir } = do
-  log $ "🗃️ Extracting " <> tarPath <> " to " <> binDir
+  log $ "🗃️ Extract " <> tarPath <> " to " <> binDir
   extractTar { file: tarPath, dest: Just binDir, flags: Nothing }
     # withExceptT \_ -> SingleError $ "Failed to extract " <> tarPath
 
@@ -51,7 +51,7 @@ installBin = do
   version <- ask
 
   lift do
-    log $ "📋 Caching " <> extractedDir
+    log $ "📋 Cache " <> extractedDir
     _ <- cacheDir { sourceDir: extractedDir, tool: "cljstyle", version: show version, arch: Nothing }
       # withExceptT \_ -> SingleError $ "Failed to cache " <> extractedDir
 
@@ -61,7 +61,7 @@ newtype InstallerForLinux = InstallerForLinux
   { run :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
   }
 
-instance hasInstallerLinux :: HasInstaller InstallerForLinux where
+instance HasInstaller InstallerForLinux where
   runInstaller (InstallerForLinux { run }) = run
 
 installer :: InstallerForLinux

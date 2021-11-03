@@ -28,13 +28,13 @@ downloadTar :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
 downloadTar = do
   URL url <- asks downloadUrl
   lift do
-    log $ "⬇️ Downloading " <> url
+    log $ "⬇️ Download " <> url
     downloadTool { url, auth: Nothing, dest: Nothing }
       # withExceptT \_ -> SingleError $ "Failed to download " <> url
 
 extractCljstyleTar :: { tarPath :: FilePath, binDir :: FilePath } -> ExceptT (SingleError String) Aff FilePath
 extractCljstyleTar { tarPath, binDir } = do
-  log $ "🗃️ Extracting " <> tarPath <> " to " <> binDir
+  log $ "🗃️ Extract " <> tarPath <> " to " <> binDir
   extractTar { file: tarPath, dest: Just binDir, flags: Nothing }
     # withExceptT \_ -> SingleError $ "Failed to extract " <> tarPath
 
@@ -48,7 +48,7 @@ installBin = do
   Version version <- ask
 
   lift do
-    log $ "📋 Caching " <> extractedDir
+    log $ "📋 Cache " <> extractedDir
     _ <- cacheDir { sourceDir: extractedDir, tool: "cljstyle", version, arch: Nothing }
       # withExceptT \_ -> SingleError $ "Failed to extract " <> extractedDir
 
@@ -58,7 +58,7 @@ newtype InstallerForDarwin = InstallerForDarwin
   { run :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
   }
 
-instance hasInstallerDarwin :: HasInstaller InstallerForDarwin where
+instance HasInstaller InstallerForDarwin where
   runInstaller (InstallerForDarwin { run }) = run
 
 installer :: InstallerForDarwin

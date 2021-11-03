@@ -35,7 +35,7 @@ downloadJar = do
   URL url <- asks downloadUrl
   version <- ask
   lift do
-    log $ "⬇️ Downloading " <> url
+    log $ "⬇️ Download " <> url
     void $
       downloadTool
         { url
@@ -57,7 +57,7 @@ installBin = do
     (liftEffect $ writeTextFile UTF8 batchFilePath batchFileContent)
       # withExceptT \_ -> SingleError $ "Failed to write " <> batchFilePath
 
-    log $ "📋 Caching " <> binDir
+    log $ "📋 Cache " <> binDir
     _ <- cacheDir { sourceDir: binDir, tool: "cljstyle", version: show version, arch: Nothing }
       # withExceptT \_ -> SingleError $ "Failed to cache " <> binDir
 
@@ -67,7 +67,7 @@ newtype InstallerForWin32 = InstallerForWin32
   { run :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
   }
 
-instance hasInstallerWin32 :: HasInstaller InstallerForWin32 where
+instance HasInstaller InstallerForWin32 where
   runInstaller (InstallerForWin32 { run }) = run
 
 installer :: InstallerForWin32

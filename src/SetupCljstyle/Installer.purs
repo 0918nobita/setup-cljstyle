@@ -6,5 +6,6 @@ import Effect.Aff (Aff)
 import Node.Path (FilePath)
 import SetupCljstyle.Types (SingleError, Version)
 
+-- | For dependency injection
 class HasInstaller a where
   runInstaller :: a -> ReaderT Version (ExceptT (SingleError String) Aff) FilePath

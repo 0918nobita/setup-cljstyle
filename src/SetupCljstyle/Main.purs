@@ -5,20 +5,18 @@ module SetupCljstyle.Main
 import Control.Alt ((<|>))
 import Control.Monad.Except (ExceptT, throwError, catchError, mapExceptT, runExceptT)
 import Control.Monad.Reader (runReaderT)
+import Control.Monad.Trans.Class (lift)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (Aff, launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (error, errorShow, log)
-import GitHub.Actions.Core (addPath, endGroup, group, startGroup)
-import Node.Buffer as Buf
-import Node.ChildProcess (Exit(Normally), defaultSpawnOptions, onExit, spawn, stderr, stdout)
-import Node.Encoding (Encoding(UTF8))
+import Effect.Class.Console (errorShow)
+import GitHub.Actions.Core (addPath, group)
 import Node.Platform (Platform(Win32, Darwin, Linux))
 import Node.Process as Process
-import Node.Stream (onData)
 import Prelude
 import SetupCljstyle.Cache (cache)
+import SetupCljstyle.Cmd (execCmd)
 import SetupCljstyle.Inputs (gatherInputs)
 import SetupCljstyle.Installer (class HasInstaller, runInstaller)
 import SetupCljstyle.Installer.Win32 as Win32
@@ -37,17 +35,10 @@ mainAff installer = do
     cachePath <- runReaderT (cache <|> runInstaller installer) version
     liftEffect $ addPath cachePath
 
-  when runCheck $
-    liftEffect do
-      startGroup "Run `cljstyle check`"
-      cljstyleCheck <- spawn "cljstyle" [ "check", "--verbose" ] defaultSpawnOptions
-      onExit cljstyleCheck \exit -> do
-        endGroup
-        case exit of
-          Normally 0 -> Process.exit 0
-          _ -> Process.exit 1
-      onData (stdout cljstyleCheck) \buf -> Buf.toString UTF8 buf >>= log
-      onData (stderr cljstyleCheck) \buf -> Buf.toString UTF8 buf >>= error
+  when runCheck $ lift $ group
+    { name: "Run `cljstyle check`"
+    , fn: execCmd "cljstyle" [ "check", "--verbose" ]
+    }
 
 handleError :: forall a b. Show a => SingleError a -> ExceptT b Aff Unit
 handleError msg = do

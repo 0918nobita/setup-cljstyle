@@ -26,7 +26,7 @@
 ```yaml
 steps:
   - uses: actions/checkout@v2
-  - uses: 0918nobita/setup-cljstyle@v0.5.0
+  - uses: 0918nobita/setup-cljstyle@v0.5.1
   - run: cljstyle version
   - run: cljstyle check
 ```
@@ -42,7 +42,7 @@ Example :
 ```yaml
 steps:
   - uses: actions/checkout@v2
-  - uses: 0918nobita/setup-cljstyle@v0.5.0
+  - uses: 0918nobita/setup-cljstyle@v0.5.1
     with:
       cljstyle-version: "0.15.0"
   - run: cljstyle version # => mvxcvi/cljstyle 0.15.0 (...)
@@ -61,7 +61,7 @@ Example :
 ```yaml
 steps:
   - uses: actions/checkout@v2
-  - uses: 0918nobita/setup-cljstyle@v0.5.0
+  - uses: 0918nobita/setup-cljstyle@v0.5.1
     with:
       run-check: true
 ```

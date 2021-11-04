@@ -1,8 +1,14 @@
-module SetupCljstyle.Types where
+module Types where
 
+import Control.Monad.Except (ExceptT)
+import Effect (Effect)
+import Effect.Aff (Aff)
 import Prelude
 
--- | Version of cljstyle
+type EffectWithExcept = ExceptT (SingleError String) Effect
+
+type AffWithExcept = ExceptT (SingleError String) Aff
+
 newtype Version = Version String
 
 instance Show Version where

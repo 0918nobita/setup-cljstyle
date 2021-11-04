@@ -4,10 +4,9 @@ module SetupCljstyle.Installer.Win32
   ) where
 
 import Control.Monad.Trans.Class (lift)
-import Control.Monad.Except (ExceptT, withExceptT)
+import Control.Monad.Except (withExceptT)
 import Control.Monad.Reader (ReaderT, ask, asks)
 import Data.Maybe (Maybe(..))
-import Effect.Aff (Aff)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (log)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool)
@@ -17,7 +16,10 @@ import Node.FS.Sync (writeTextFile)
 import Node.Path (FilePath, concat)
 import Prelude
 import SetupCljstyle.Installer (class HasInstaller)
-import SetupCljstyle.Types (SingleError(..), Version(..))
+import Types (AffWithExcept, SingleError(..), Version(..))
+
+binDir :: String
+binDir = "D:\\cljstyle"
 
 downloadUrl :: Version -> URL
 downloadUrl (Version version) =
@@ -27,15 +29,12 @@ downloadUrl (Version version) =
     <> version
     <> ".jar"
 
-binDir :: String
-binDir = "D:\\cljstyle"
-
-downloadJar :: ReaderT Version (ExceptT (SingleError String) Aff) Unit
+downloadJar :: ReaderT Version AffWithExcept Unit
 downloadJar = do
   URL url <- asks downloadUrl
   version <- ask
   lift do
-    log $ "⬇️ Download " <> url
+    log $ "Download " <> url
     void $
       downloadTool
         { url
@@ -44,7 +43,7 @@ downloadJar = do
         }
         # withExceptT \_ -> SingleError $ "Failed to download " <> url
 
-installBin :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
+installBin :: ReaderT Version AffWithExcept FilePath
 installBin = do
   downloadJar
 
@@ -52,19 +51,19 @@ installBin = do
 
   lift do
     let batchFilePath = concat [ binDir, "cljstyle.bat" ]
-    log $ "📝 Write " <> batchFilePath
+    log $ "Write " <> batchFilePath
     let batchFileContent = "java -jar %~dp0cljstyle-" <> show version <> ".jar %*"
     (liftEffect $ writeTextFile UTF8 batchFilePath batchFileContent)
       # withExceptT \_ -> SingleError $ "Failed to write " <> batchFilePath
 
-    log $ "📋 Cache " <> binDir
+    log $ "Cache " <> binDir
     _ <- cacheDir { sourceDir: binDir, tool: "cljstyle", version: show version, arch: Nothing }
       # withExceptT \_ -> SingleError $ "Failed to cache " <> binDir
 
     pure binDir
 
 newtype InstallerForWin32 = InstallerForWin32
-  { run :: ReaderT Version (ExceptT (SingleError String) Aff) FilePath
+  { run :: ReaderT Version AffWithExcept FilePath
   }
 
 instance HasInstaller InstallerForWin32 where

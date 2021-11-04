@@ -1,4 +1,4 @@
-module SetupCljstyle.Cmd where
+module SetupCljstyle.Command where
 
 import Data.Either (Either(..))
 import Effect.Aff (Aff, makeAff)

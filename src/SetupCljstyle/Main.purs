@@ -3,47 +3,39 @@ module SetupCljstyle.Main
   ) where
 
 import Control.Alt ((<|>))
-import Control.Monad.Except (ExceptT, throwError, catchError, mapExceptT, runExceptT)
+import Control.Monad.Except (throwError, catchError, runExceptT)
 import Control.Monad.Reader (runReaderT)
 import Control.Monad.Trans.Class (lift)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
-import Effect.Aff (Aff, launchAff_)
+import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (errorShow)
-import GitHub.Actions.Core (addPath, group)
+import GitHub.Actions.Core (addPath)
+import GitHub.Actions.Extension (group, groupExceptT)
 import Node.Platform (Platform(Win32, Darwin, Linux))
 import Node.Process as Process
 import Prelude
 import SetupCljstyle.Cache (cache)
-import SetupCljstyle.Cmd (execCmd)
-import SetupCljstyle.Inputs (gatherInputs)
+import SetupCljstyle.Command (execCmd)
+import SetupCljstyle.Input (gatherInputs)
 import SetupCljstyle.Installer (class HasInstaller, runInstaller)
 import SetupCljstyle.Installer.Win32 as Win32
 import SetupCljstyle.Installer.Darwin as Darwin
 import SetupCljstyle.Installer.Linux as Linux
-import SetupCljstyle.Types (SingleError(..))
+import Types (AffWithExcept, SingleError(..))
 
-group' :: forall e a. String -> ExceptT e Aff a -> ExceptT e Aff a
-group' name = mapExceptT \aff -> group { fn: aff, name }
-
-mainAff :: forall a. (HasInstaller a) => a -> ExceptT (SingleError String) Aff Unit
+mainAff :: forall a. (HasInstaller a) => a -> AffWithExcept Unit
 mainAff installer = do
-  { cljstyleVersion: version, runCheck } <- group' "Gather inputs" gatherInputs
+  { cljstyleVersion: version, runCheck } <- groupExceptT "Gather inputs" gatherInputs
 
-  group' ("Install cljstyle " <> show version) do
+  groupExceptT ("Install cljstyle " <> show version) do
     cachePath <- runReaderT (cache <|> runInstaller installer) version
     liftEffect $ addPath cachePath
 
-  when runCheck $ lift $ group
-    { name: "Run `cljstyle check`"
-    , fn: execCmd "cljstyle" [ "check", "--verbose" ]
-    }
-
-handleError :: forall a b. Show a => SingleError a -> ExceptT b Aff Unit
-handleError msg = do
-  errorShow msg
-  liftEffect $ Process.exit 1
+  when runCheck $ lift
+    $ group "Run `cljstyle check`"
+    $ execCmd "cljstyle" [ "check", "--verbose" ]
 
 main :: Effect Unit
 main =
@@ -58,3 +50,5 @@ main =
       mainAff Linux.installer
     Just _ -> throwError $ SingleError "Unsupported platform"
     Nothing -> throwError $ SingleError "Failed to identify platform"
+
+  handleError msg = liftEffect $ errorShow msg *> Process.exit 1

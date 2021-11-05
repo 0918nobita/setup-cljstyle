@@ -18,16 +18,18 @@ import Node.Process as Process
 import Prelude
 import SetupCljstyle.Cache (cache)
 import SetupCljstyle.Command (execCmd)
-import SetupCljstyle.Input (gatherInputs)
+import SetupCljstyle.InputResolver (class HasRawInputs, resolveInputs)
 import SetupCljstyle.Installer (class HasInstaller, runInstaller)
 import SetupCljstyle.Installer.Win32 as Win32
 import SetupCljstyle.Installer.Darwin as Darwin
 import SetupCljstyle.Installer.Linux as Linux
+import SetupCljstyle.RawInputSource.GitHubActions (ghaRawInputSource)
 import Types (AffWithExcept, SingleError(..))
 
-mainAff :: forall a. (HasInstaller a) => a -> AffWithExcept Unit
-mainAff installer = do
-  { cljstyleVersion: version, runCheck } <- groupExceptT "Gather inputs" gatherInputs
+mainAff :: forall a b. HasInstaller a => HasRawInputs b => a -> b -> AffWithExcept Unit
+mainAff installer inputResolver = do
+  { cljstyleVersion: version, runCheck } <-
+    groupExceptT "Gather inputs" $ runReaderT resolveInputs inputResolver
 
   groupExceptT ("Install cljstyle " <> show version) do
     cachePath <- runReaderT (cache <|> runInstaller installer) version
@@ -43,11 +45,11 @@ main =
   where
   mainAff' = case Process.platform of
     Just Win32 ->
-      mainAff Win32.installer
+      mainAff Win32.installer ghaRawInputSource
     Just Darwin ->
-      mainAff Darwin.installer
+      mainAff Darwin.installer ghaRawInputSource
     Just Linux ->
-      mainAff Linux.installer
+      mainAff Linux.installer ghaRawInputSource
     Just _ -> throwError $ SingleError "Unsupported platform"
     Nothing -> throwError $ SingleError "Failed to identify platform"
 

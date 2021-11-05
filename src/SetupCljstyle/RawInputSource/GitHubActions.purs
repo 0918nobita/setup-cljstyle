@@ -7,19 +7,19 @@ import Prelude
 import SetupCljstyle.InputResolver (class HasRawInputs)
 import Types (AffWithExcept)
 
-newtype GHARawInputSource = RawInputSource
+newtype GHARawInputSource = GHARawInputSource
   { cljstyleVersion :: AffWithExcept String
   , authToken :: AffWithExcept String
   , runCheck :: AffWithExcept String
   }
 
 instance HasRawInputs GHARawInputSource where
-  getCljstyleVersion (RawInputSource { cljstyleVersion }) = cljstyleVersion
-  getAuthToken (RawInputSource { authToken }) = authToken
-  getRunCheck (RawInputSource { runCheck }) = runCheck
+  getCljstyleVersion (GHARawInputSource { cljstyleVersion }) = cljstyleVersion
+  getAuthToken (GHARawInputSource { authToken }) = authToken
+  getRunCheck (GHARawInputSource { runCheck }) = runCheck
 
 ghaRawInputSource :: GHARawInputSource
-ghaRawInputSource = RawInputSource
+ghaRawInputSource = GHARawInputSource
   { cljstyleVersion: mapExceptT liftEffect $ inputExceptT "cljstyle-version"
   , authToken: mapExceptT liftEffect $ inputExceptT "token"
   , runCheck: mapExceptT liftEffect $ inputExceptT "run-check"

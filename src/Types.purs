@@ -11,6 +11,9 @@ type AffWithExcept = ExceptT (SingleError String) Aff
 
 newtype Version = Version String
 
+instance Eq Version where
+  eq (Version a) (Version b) = a == b
+
 instance Show Version where
   show (Version v) = v
 

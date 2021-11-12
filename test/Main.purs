@@ -28,7 +28,8 @@ main = do
 
     describe "InputResolver" do
       describe "resolveInputs" do
-        let fetcher = TestFetcher "{ \"tag_name\":\"0.15.0\"}"
+        let fetcher = TestFetcher "{\"tag_name\":\"0.15.0\"}"
+
         it "when the cljstyle's version is specified" do
           result <- runExceptT do
             rawInputs <- gatherRawInputs $ testRawInputSource "0.14.0"

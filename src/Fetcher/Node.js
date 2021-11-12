@@ -5,7 +5,10 @@ exports._getTextImpl =
     https.get(
       url,
       {
-        headers: { Authorization: authorization, "User-Agent": 'Node.js' },
+        headers: {
+          Authorization: authorization,
+          'User-Agent': 'Node.js',
+        },
       },
       (res) => {
         res.on('error', (err) => onError(err));

@@ -17,9 +17,9 @@ instance HasRawInputs TestRawInputSource where
     runCheck' <- runCheck
     pure { cljstyleVersion: cljstyleVersion', authToken: authToken', runCheck: runCheck' }
 
-testRawInputSource :: TestRawInputSource
-testRawInputSource = TestRawInputSource
-  { cljstyleVersion: pure "0.15.0"
+testRawInputSource :: String -> TestRawInputSource
+testRawInputSource version = TestRawInputSource
+  { cljstyleVersion: pure version
   , authToken: pure "TOKEN"
   , runCheck: pure "false"
   }

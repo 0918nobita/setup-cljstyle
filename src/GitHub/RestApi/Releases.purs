@@ -2,15 +2,14 @@ module GitHub.RestApi.Releases
   ( fetchLatestRelease
   ) where
 
-import Control.Monad.Except (except, lift)
+import Control.Monad.Except (except)
 import Data.Argonaut (decodeJson, jsonParser, printJsonDecodeError)
 import Data.EitherR (fmapL)
-import Foreign.Object (singleton)
-import Milkis (getMethod)
-import Milkis as M
-import Milkis.Impl.Node (nodeFetch)
+import Fetcher (class Fetcher, getText)
 import Prelude
 import Types (AffWithExcept, SingleError(..), Version(..))
+
+type Release = { tag_name :: String }
 
 type FetchLatestReleaseArgs =
   { authToken :: String
@@ -18,19 +17,13 @@ type FetchLatestReleaseArgs =
   , repo :: String
   }
 
-type Release = { tag_name :: String }
+fetchLatestRelease :: forall a. Fetcher a => a -> FetchLatestReleaseArgs -> AffWithExcept Version
+fetchLatestRelease fetcher { authToken, owner, repo } = do
+  let url = "https://api.github.com/repos/" <> owner <> "/" <> repo <> "/releases/latest"
+  resBody <- getText fetcher { url, authorization: "Bearer " <> authToken }
 
-fetch :: M.Fetch
-fetch = M.fetch nodeFetch
-
-fetchLatestRelease :: FetchLatestReleaseArgs -> AffWithExcept Version
-fetchLatestRelease args = do
-  let url = "https://api.github.com/repos/" <> args.owner <> "/" <> args.repo <> "/releases/latest"
-  res <- lift $ fetch (M.URL url)
-    { method: getMethod
-    , headers: singleton "Authorization" $ "Bearer " <> args.authToken
-    }
-  resBody <- lift $ M.text res
   parsed <- except $ jsonParser resBody # fmapL SingleError
-  decoded :: Release <- except $ decodeJson parsed # fmapL (SingleError <<< printJsonDecodeError)
+
+  decoded :: Release <- except $ decodeJson parsed # fmapL (printJsonDecodeError >>> SingleError)
+
   pure $ Version decoded.tag_name

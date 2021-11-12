@@ -7,6 +7,7 @@ import Effect.Aff (launchAff_)
 import Prelude
 import SetupCljstyle.InputResolver (resolveInputs)
 import SetupCljstyle.RawInputSource (gatherRawInputs)
+import Test.Fetcher (TestFetcher(..))
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter.Console (consoleReporter)
@@ -29,5 +30,5 @@ main = do
       it "resolveInputs" do
         result <- runExceptT do
           rawInputs <- gatherRawInputs testRawInputSource
-          resolveInputs rawInputs
+          resolveInputs { fetcher: TestFetcher, rawInputs }
         result `shouldEqual` Right { cljstyleVersion: Version "0.15.0", runCheck: false }

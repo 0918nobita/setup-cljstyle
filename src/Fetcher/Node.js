@@ -1,12 +1,22 @@
-const fetch = require('node-fetch');
+const https = require('https');
 
 exports._getTextImpl =
   ({ url, authorization }) => (onError, onSuccess) => {
-    fetch(url, { headers: { Authorization: authorization } })
-      .then((res) =>
-        res
-          .text()
-          .then((text) => onSuccess(text))
-          .catch((err) => onError(err)))
-      .catch((err) => onError(err));
+    https.get(
+      url,
+      {
+        headers: { Authorization: authorization, "User-Agent": 'Node.js' },
+      },
+      (res) => {
+        res.on('error', (err) => onError(err));
+
+        let data = '';
+
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+
+        res.on('end', () => onSuccess(data));
+      }
+    );
   };

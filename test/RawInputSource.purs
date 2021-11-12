@@ -1,7 +1,7 @@
 module Test.RawInputSource where
 
 import Prelude
-import SetupCljstyle.InputResolver (class HasRawInputs)
+import SetupCljstyle.RawInputSource (class HasRawInputs)
 import Types (AffWithExcept)
 
 newtype TestRawInputSource = TestRawInputSource
@@ -11,9 +11,11 @@ newtype TestRawInputSource = TestRawInputSource
   }
 
 instance HasRawInputs TestRawInputSource where
-  getCljstyleVersion (TestRawInputSource { cljstyleVersion }) = cljstyleVersion
-  getAuthToken (TestRawInputSource { authToken }) = authToken
-  getRunCheck (TestRawInputSource { runCheck }) = runCheck
+  gatherRawInputs (TestRawInputSource { cljstyleVersion, authToken, runCheck }) = do
+    cljstyleVersion' <- cljstyleVersion
+    authToken' <- authToken
+    runCheck' <- runCheck
+    pure { cljstyleVersion: cljstyleVersion', authToken: authToken', runCheck: runCheck' }
 
 testRawInputSource :: TestRawInputSource
 testRawInputSource = TestRawInputSource

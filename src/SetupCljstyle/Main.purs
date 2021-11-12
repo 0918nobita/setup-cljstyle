@@ -18,18 +18,21 @@ import Node.Process as Process
 import Prelude
 import SetupCljstyle.Cache (cache)
 import SetupCljstyle.Command (execCmd)
-import SetupCljstyle.InputResolver (class HasRawInputs, resolveInputs)
+import SetupCljstyle.InputResolver (resolveInputs)
 import SetupCljstyle.Installer (class HasInstaller, runInstaller)
 import SetupCljstyle.Installer.Win32 as Win32
 import SetupCljstyle.Installer.Darwin as Darwin
 import SetupCljstyle.Installer.Linux as Linux
+import SetupCljstyle.RawInputSource (class HasRawInputs, gatherRawInputs)
 import SetupCljstyle.RawInputSource.GitHubActions (ghaRawInputSource)
 import Types (AffWithExcept, SingleError(..))
 
 mainAff :: forall a b. HasInstaller a => HasRawInputs b => a -> b -> AffWithExcept Unit
-mainAff installer inputResolver = do
+mainAff installer inputSource = do
+  rawInputs <- gatherRawInputs inputSource
+
   { cljstyleVersion: version, runCheck } <-
-    groupExceptT "Gather inputs" $ runReaderT resolveInputs inputResolver
+    groupExceptT "Gather inputs" $ resolveInputs rawInputs
 
   groupExceptT ("Install cljstyle " <> show version) do
     cachePath <- runReaderT (cache <|> runInstaller installer) version

@@ -1,12 +1,12 @@
 module Test.Main where
 
 import Control.Monad.Except (runExceptT)
-import Control.Monad.Reader (runReaderT)
 import Data.Either (Either(..))
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Prelude
 import SetupCljstyle.InputResolver (resolveInputs)
+import SetupCljstyle.RawInputSource (gatherRawInputs)
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter.Console (consoleReporter)
@@ -27,5 +27,7 @@ main = do
 
     describe "InputResolver" do
       it "resolveInputs" do
-        result <- runExceptT $ runReaderT resolveInputs testRawInputSource
+        result <- runExceptT do
+          rawInputs <- gatherRawInputs testRawInputSource
+          resolveInputs rawInputs
         result `shouldEqual` Right { cljstyleVersion: Version "0.15.0", runCheck: false }

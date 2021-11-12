@@ -1,4 +1,6 @@
-module Fetcher.Node where
+module Fetcher.Node
+  ( NodeFetcher(..)
+  ) where
 
 import Control.Monad.Trans.Class (lift)
 import Effect.Aff (Aff)
@@ -6,9 +8,11 @@ import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Fetcher (class Fetcher)
 import Prelude
 
-foreign import _getTextImpl :: { url :: String, authorization :: String } -> EffectFnAff String
+type GetTextArgs = { url :: String, authorization :: String }
 
-getTextImpl :: { url :: String, authorization :: String } -> Aff String
+foreign import _getTextImpl :: GetTextArgs -> EffectFnAff String
+
+getTextImpl :: GetTextArgs -> Aff String
 getTextImpl = fromEffectFnAff <<< _getTextImpl
 
 data NodeFetcher = NodeFetcher

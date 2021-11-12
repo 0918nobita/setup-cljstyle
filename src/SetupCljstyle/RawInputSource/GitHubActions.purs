@@ -14,11 +14,11 @@ newtype GHARawInputSource = GHARawInputSource
   }
 
 instance HasRawInputs GHARawInputSource where
-  gatherRawInputs (GHARawInputSource { cljstyleVersion, authToken, runCheck }) = do
-    cljstyleVersion' <- cljstyleVersion
-    authToken' <- authToken
-    runCheck' <- runCheck
-    pure { cljstyleVersion: cljstyleVersion', authToken: authToken', runCheck: runCheck' }
+  gatherRawInputs (GHARawInputSource s) = do
+    cljstyleVersion <- s.cljstyleVersion
+    authToken <- s.authToken
+    runCheck <- s.runCheck
+    pure { cljstyleVersion, authToken, runCheck }
 
 ghaRawInputSource :: GHARawInputSource
 ghaRawInputSource = GHARawInputSource

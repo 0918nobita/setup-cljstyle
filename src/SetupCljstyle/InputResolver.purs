@@ -1,4 +1,6 @@
-module SetupCljstyle.InputResolver where
+module SetupCljstyle.InputResolver
+  ( resolveInputs
+  ) where
 
 import Control.Alt ((<|>))
 import Control.Monad.Except (except, throwError)
@@ -18,10 +20,17 @@ import Prelude
 import SetupCljstyle.RawInputSource (RawInputs)
 import Types (AffWithExcept, SingleError(..), Version(..))
 
-versionRegex :: Either (SingleError String) Regex
-versionRegex = regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags # fmapL SingleError
+type Env a =
+  { fetcher :: a
+  , rawInputs :: RawInputs
+  }
 
-tryGetSpecifiedVersion :: forall a. ReaderT { fetcher :: a, rawInputs :: RawInputs } AffWithExcept Version
+versionRegex :: Either (SingleError String) Regex
+versionRegex =
+  regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
+    # fmapL SingleError
+
+tryGetSpecifiedVersion :: forall a. ReaderT (Env a) AffWithExcept Version
 tryGetSpecifiedVersion = do
   { rawInputs: { cljstyleVersion: version } } <- ask
 
@@ -30,21 +39,21 @@ tryGetSpecifiedVersion = do
       throwError $ SingleError "Version is not specified"
     else do
       verRegex <- except versionRegex
+
       if test verRegex version then
         pure $ Version version
       else
         throwError $ SingleError "The format of cljstyle-version is invalid."
 
-tryGetLatestVersion :: forall a. Fetcher a => ReaderT { fetcher :: a, rawInputs :: RawInputs } AffWithExcept Version
+tryGetLatestVersion :: forall a. Fetcher a => ReaderT (Env a) AffWithExcept Version
 tryGetLatestVersion = do
   { fetcher, rawInputs: { authToken } } <- ask
 
   log "Attempt to fetch the latest version of cljstyle by calling GitHub REST API"
 
-  lift do
-    fetchLatestRelease fetcher { authToken, owner: "greglook", repo: "cljstyle" }
+  lift $ fetchLatestRelease fetcher { authToken, owner: "greglook", repo: "cljstyle" }
 
-resolveCljstyleVersionInput :: forall a. Fetcher a => ReaderT { fetcher :: a, rawInputs :: RawInputs } AffWithExcept Version
+resolveCljstyleVersionInput :: forall a. Fetcher a => ReaderT (Env a) AffWithExcept Version
 resolveCljstyleVersionInput = tryGetSpecifiedVersion <|> tryGetLatestVersion
 
 resolveRunCheckInput :: ReaderT RawInputs AffWithExcept Boolean
@@ -61,7 +70,7 @@ type Inputs =
   , runCheck :: Boolean
   }
 
-resolveInputs :: forall a. Fetcher a => { fetcher :: a, rawInputs :: RawInputs } -> AffWithExcept Inputs
+resolveInputs :: forall a. Fetcher a => Env a -> AffWithExcept Inputs
 resolveInputs env = runReaderT reader env
   where
   reader = do

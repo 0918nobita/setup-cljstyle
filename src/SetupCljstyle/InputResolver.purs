@@ -2,7 +2,7 @@ module SetupCljstyle.InputResolver where
 
 import Control.Alt ((<|>))
 import Control.Monad.Except (except, throwError)
-import Control.Monad.Reader (ReaderT, ask, asks, runReaderT)
+import Control.Monad.Reader (ReaderT, ask, runReaderT, withReaderT)
 import Control.Monad.Trans.Class (lift)
 import Data.Argonaut (jsonParser)
 import Data.Argonaut.Decode.Decoders (decodeBoolean)
@@ -12,6 +12,7 @@ import Data.String (null)
 import Data.String.Regex (Regex, test, regex)
 import Data.String.Regex.Flags (noFlags)
 import Effect.Class.Console (log)
+import Fetcher (class Fetcher)
 import GitHub.RestApi.Releases (fetchLatestRelease)
 import Prelude
 import SetupCljstyle.RawInputSource (RawInputs)
@@ -20,9 +21,10 @@ import Types (AffWithExcept, SingleError(..), Version(..))
 versionRegex :: Either (SingleError String) Regex
 versionRegex = regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags # fmapL SingleError
 
-tryGetSpecifiedVersion :: ReaderT RawInputs AffWithExcept Version
+tryGetSpecifiedVersion :: forall a. ReaderT { fetcher :: a, rawInputs :: RawInputs } AffWithExcept Version
 tryGetSpecifiedVersion = do
-  version <- asks _.cljstyleVersion
+  { rawInputs: { cljstyleVersion: version } } <- ask
+
   lift do
     if null version then
       throwError $ SingleError "Version is not specified"
@@ -33,19 +35,22 @@ tryGetSpecifiedVersion = do
       else
         throwError $ SingleError "The format of cljstyle-version is invalid."
 
-tryGetLatestVersion :: ReaderT RawInputs AffWithExcept Version
+tryGetLatestVersion :: forall a. Fetcher a => ReaderT { fetcher :: a, rawInputs :: RawInputs } AffWithExcept Version
 tryGetLatestVersion = do
-  { authToken } <- ask
-  log "Attempt to fetch the latest version of cljstyle by calling GitHub REST API"
-  lift do
-    fetchLatestRelease { authToken, owner: "greglook", repo: "cljstyle" }
+  { fetcher, rawInputs: { authToken } } <- ask
 
-resolveCljstyleVersionInput :: ReaderT RawInputs AffWithExcept Version
+  log "Attempt to fetch the latest version of cljstyle by calling GitHub REST API"
+
+  lift do
+    fetchLatestRelease fetcher { authToken, owner: "greglook", repo: "cljstyle" }
+
+resolveCljstyleVersionInput :: forall a. Fetcher a => ReaderT { fetcher :: a, rawInputs :: RawInputs } AffWithExcept Version
 resolveCljstyleVersionInput = tryGetSpecifiedVersion <|> tryGetLatestVersion
 
 resolveRunCheckInput :: ReaderT RawInputs AffWithExcept Boolean
 resolveRunCheckInput = do
   { runCheck } <- ask
+
   lift do
     parsed <- except $ jsonParser runCheck # fmapL \_ -> SingleError "Failed to parse `run-check` input"
 
@@ -56,11 +61,10 @@ type Inputs =
   , runCheck :: Boolean
   }
 
-resolveInputs :: RawInputs -> AffWithExcept Inputs
-resolveInputs rawInputs = do
-  runReaderT reader rawInputs
+resolveInputs :: forall a. Fetcher a => { fetcher :: a, rawInputs :: RawInputs } -> AffWithExcept Inputs
+resolveInputs env = runReaderT reader env
   where
   reader = do
     cljstyleVersion <- resolveCljstyleVersionInput
-    runCheck <- resolveRunCheckInput
+    runCheck <- withReaderT _.rawInputs resolveRunCheckInput
     pure { cljstyleVersion, runCheck }

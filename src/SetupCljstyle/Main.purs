@@ -11,6 +11,8 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (errorShow)
+import Fetcher (class Fetcher)
+import Fetcher.Node (NodeFetcher(..))
 import GitHub.Actions.Core (addPath)
 import GitHub.Actions.Extension (group, groupExceptT)
 import Node.Platform (Platform(Win32, Darwin, Linux))
@@ -27,12 +29,12 @@ import SetupCljstyle.RawInputSource (class HasRawInputs, gatherRawInputs)
 import SetupCljstyle.RawInputSource.GitHubActions (ghaRawInputSource)
 import Types (AffWithExcept, SingleError(..))
 
-mainAff :: forall a b. HasInstaller a => HasRawInputs b => a -> b -> AffWithExcept Unit
-mainAff installer inputSource = do
+mainAff :: forall f i r. Fetcher f => HasInstaller i => HasRawInputs r => f -> i -> r -> AffWithExcept Unit
+mainAff fetcher installer inputSource = do
   rawInputs <- gatherRawInputs inputSource
 
   { cljstyleVersion: version, runCheck } <-
-    groupExceptT "Gather inputs" $ resolveInputs rawInputs
+    groupExceptT "Gather inputs" $ resolveInputs { fetcher, rawInputs }
 
   groupExceptT ("Install cljstyle " <> show version) do
     cachePath <- runReaderT (cache <|> runInstaller installer) version
@@ -48,11 +50,11 @@ main =
   where
   mainAff' = case Process.platform of
     Just Win32 ->
-      mainAff Win32.installer ghaRawInputSource
+      mainAff NodeFetcher Win32.installer ghaRawInputSource
     Just Darwin ->
-      mainAff Darwin.installer ghaRawInputSource
+      mainAff NodeFetcher Darwin.installer ghaRawInputSource
     Just Linux ->
-      mainAff Linux.installer ghaRawInputSource
+      mainAff NodeFetcher Linux.installer ghaRawInputSource
     Just _ -> throwError $ SingleError "Unsupported platform"
     Nothing -> throwError $ SingleError "Failed to identify platform"
 

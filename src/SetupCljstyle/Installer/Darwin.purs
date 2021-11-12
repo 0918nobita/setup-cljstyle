@@ -9,11 +9,10 @@ import Control.Monad.Trans.Class (lift)
 import Data.Maybe (Maybe(..))
 import Effect.Class.Console (log)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
-import Milkis (URL(..))
 import Node.Path (FilePath)
 import Prelude
 import SetupCljstyle.Installer (class HasInstaller)
-import Types (AffWithExcept, SingleError(..), Version(..))
+import Types (AffWithExcept, SingleError(..), URL(..), Version(..))
 
 downloadUrl :: Version -> URL
 downloadUrl (Version version) =

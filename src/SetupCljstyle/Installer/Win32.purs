@@ -10,13 +10,12 @@ import Data.Maybe (Maybe(..))
 import Effect.Class (liftEffect)
 import Effect.Class.Console (log)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool)
-import Milkis (URL(..))
 import Node.Encoding (Encoding(UTF8))
 import Node.FS.Sync (writeTextFile)
 import Node.Path (FilePath, concat)
 import Prelude
 import SetupCljstyle.Installer (class HasInstaller)
-import Types (AffWithExcept, SingleError(..), Version(..))
+import Types (AffWithExcept, SingleError(..), URL(..), Version(..))
 
 binDir :: String
 binDir = "D:\\cljstyle"

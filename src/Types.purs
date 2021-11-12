@@ -9,6 +9,8 @@ type EffectWithExcept = ExceptT (SingleError String) Effect
 
 type AffWithExcept = ExceptT (SingleError String) Aff
 
+newtype URL = URL String
+
 newtype Version = Version String
 
 instance Eq Version where

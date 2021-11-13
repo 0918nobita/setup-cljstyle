@@ -1,8 +1,9 @@
 module Test.Installer where
 
+import Prelude
+
 import Control.Monad.Reader (ReaderT)
 import Node.Path (FilePath)
-import Prelude
 import SetupCljstyle.Installer (class HasInstaller)
 import Types (AffWithExcept, Version)
 

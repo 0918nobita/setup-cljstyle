@@ -1,10 +1,12 @@
 module GitHub.Actions.Extension where
 
+import Prelude
+
 import Control.Monad.Except (ExceptT, mapExceptT, withExceptT)
+import Control.Monad.Reader (ReaderT, mapReaderT)
 import Data.Maybe (Maybe(Nothing))
 import Effect.Aff (Aff)
 import GitHub.Actions.Core as Core
-import Prelude
 import Types (EffectWithExcept, SingleError(..))
 
 inputExceptT :: String -> EffectWithExcept String
@@ -15,5 +17,5 @@ inputExceptT name =
 group :: forall a. String -> Aff a -> Aff a
 group name aff = Core.group { name, fn: aff }
 
-groupExceptT :: forall e a. String -> ExceptT e Aff a -> ExceptT e Aff a
-groupExceptT = mapExceptT <<< group
+group' :: forall r e a. String -> ReaderT r (ExceptT e Aff) a -> ReaderT r (ExceptT e Aff) a
+group' = mapReaderT <<< mapExceptT <<< group

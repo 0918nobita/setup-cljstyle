@@ -1,6 +1,7 @@
 module Test.RawInputSource where
 
 import Prelude
+
 import SetupCljstyle.RawInputSource (class HasRawInputs)
 import Types (AffWithExcept)
 

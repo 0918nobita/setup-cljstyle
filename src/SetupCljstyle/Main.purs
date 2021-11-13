@@ -2,9 +2,11 @@ module SetupCljstyle.Main
   ( main
   ) where
 
+import Prelude
+
 import Control.Alt ((<|>))
 import Control.Monad.Except (throwError, catchError, runExceptT)
-import Control.Monad.Reader (runReaderT)
+import Control.Monad.Reader (ReaderT, ask, runReaderT, withReaderT)
 import Control.Monad.Trans.Class (lift)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
@@ -14,35 +16,37 @@ import Effect.Class.Console (errorShow)
 import Fetcher (class Fetcher)
 import Fetcher.Node (NodeFetcher(..))
 import GitHub.Actions.Core (addPath)
-import GitHub.Actions.Extension (group, groupExceptT)
+import GitHub.Actions.Extension (group, group')
 import Node.Platform (Platform(Win32, Darwin, Linux))
 import Node.Process as Process
-import Prelude
 import SetupCljstyle.Cache (cache)
 import SetupCljstyle.Command (execCmd)
-import SetupCljstyle.InputResolver (resolveInputs)
+import SetupCljstyle.InputResolver (RunCheckInput(..), resolveInputs)
 import SetupCljstyle.Installer (class HasInstaller, runInstaller)
-import SetupCljstyle.Installer.Win32 as Win32
 import SetupCljstyle.Installer.Darwin as Darwin
 import SetupCljstyle.Installer.Linux as Linux
+import SetupCljstyle.Installer.Win32 as Win32
 import SetupCljstyle.RawInputSource (class HasRawInputs, gatherRawInputs)
 import SetupCljstyle.RawInputSource.GitHubActions (ghaRawInputSource)
 import Types (AffWithExcept, SingleError(..))
 
-mainAff :: forall f i r. Fetcher f => HasInstaller i => HasRawInputs r => f -> i -> r -> AffWithExcept Unit
-mainAff fetcher installer inputSource = do
-  rawInputs <- gatherRawInputs inputSource
+type Env f i r = { fetcher :: f, installer :: i, rawInputSource :: r }
 
-  { cljstyleVersion: version, runCheck } <-
-    groupExceptT "Gather inputs" $ resolveInputs { fetcher, rawInputs }
+mainReaderT :: forall f i r. Fetcher f => HasInstaller i => HasRawInputs r => ReaderT (Env f i r) AffWithExcept Unit
+mainReaderT = do
+  { installer, rawInputSource } <- ask
 
-  groupExceptT ("Install cljstyle " <> show version) do
-    cachePath <- runReaderT (cache <|> runInstaller installer) version
+  rawInputs <- lift $ gatherRawInputs rawInputSource
+
+  { cljstyleVersion, runCheck } <- group' "Gather inputs" $ withReaderT (\r -> { fetcher: r.fetcher, rawInputs }) resolveInputs
+
+  group' ("Install cljstyle " <> show cljstyleVersion) do
+    cachePath <- withReaderT (\_ -> cljstyleVersion) $ cache <|> runInstaller installer
     liftEffect $ addPath cachePath
 
-  when runCheck $ lift
-    $ group "Run `cljstyle check`"
-    $ execCmd "cljstyle" [ "check", "--verbose" ]
+  lift $ lift case runCheck of
+    RunCheck _ -> group "Run `cljstyle check`" $ execCmd "cljstyle" [ "check", "--verbose" ]
+    DontRunCheck -> mempty
 
 main :: Effect Unit
 main =
@@ -50,12 +54,16 @@ main =
   where
   mainAff' = case Process.platform of
     Just Win32 ->
-      mainAff NodeFetcher Win32.installer ghaRawInputSource
+      runReaderT mainReaderT { fetcher: NodeFetcher, installer: Win32.installer, rawInputSource: ghaRawInputSource }
+
     Just Darwin ->
-      mainAff NodeFetcher Darwin.installer ghaRawInputSource
+      runReaderT mainReaderT { fetcher: NodeFetcher, installer: Darwin.installer, rawInputSource: ghaRawInputSource }
+
     Just Linux ->
-      mainAff NodeFetcher Linux.installer ghaRawInputSource
+      runReaderT mainReaderT { fetcher: NodeFetcher, installer: Linux.installer, rawInputSource: ghaRawInputSource }
+
     Just _ -> throwError $ SingleError "Unsupported platform"
+
     Nothing -> throwError $ SingleError "Failed to identify platform"
 
   handleError msg = liftEffect $ errorShow msg *> Process.exit 1

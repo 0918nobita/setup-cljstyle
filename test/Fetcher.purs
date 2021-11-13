@@ -1,7 +1,8 @@
 module Test.Fetcher where
 
-import Fetcher (class Fetcher)
 import Prelude
+
+import Fetcher (class Fetcher)
 
 data TestFetcher = TestFetcher String
 

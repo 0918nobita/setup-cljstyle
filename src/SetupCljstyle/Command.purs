@@ -1,5 +1,7 @@
 module SetupCljstyle.Command where
 
+import Prelude
+
 import Data.Either (Either(..))
 import Effect.Aff (Aff, makeAff)
 import Effect.Aff as Aff
@@ -8,7 +10,6 @@ import Node.Buffer as Buf
 import Node.ChildProcess (Exit(Normally), defaultSpawnOptions, onExit, spawn, stderr, stdout)
 import Node.Encoding (Encoding(UTF8))
 import Node.Stream (onData)
-import Prelude
 
 -- | Asynchronously run a shell command.
 -- | Its stdout and stderr are piped to the current process.

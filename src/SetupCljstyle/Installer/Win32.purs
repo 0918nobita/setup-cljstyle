@@ -3,6 +3,8 @@ module SetupCljstyle.Installer.Win32
   , installer
   ) where
 
+import Prelude
+
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Except (withExceptT)
 import Control.Monad.Reader (ReaderT, ask, asks)
@@ -13,7 +15,6 @@ import GitHub.Actions.ToolCache (cacheDir, downloadTool)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS.Sync (writeTextFile)
 import Node.Path (FilePath, concat)
-import Prelude
 import SetupCljstyle.Installer (class HasInstaller)
 import Types (AffWithExcept, SingleError(..), URL(..), Version(..))
 

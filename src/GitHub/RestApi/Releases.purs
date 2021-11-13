@@ -2,11 +2,12 @@ module GitHub.RestApi.Releases
   ( fetchLatestRelease
   ) where
 
+import Prelude
+
 import Control.Monad.Except (except)
 import Data.Argonaut (decodeJson, jsonParser, printJsonDecodeError)
 import Data.EitherR (fmapL)
 import Fetcher (class Fetcher, getText)
-import Prelude
 import Types (AffWithExcept, SingleError(..), Version(..))
 
 type Release = { tag_name :: String }

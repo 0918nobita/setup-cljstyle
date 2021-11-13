@@ -2,11 +2,12 @@ module Fetcher.Node
   ( NodeFetcher(..)
   ) where
 
+import Prelude
+
 import Control.Monad.Trans.Class (lift)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
 import Fetcher (class Fetcher)
-import Prelude
 
 type GetTextArgs = { url :: String, authorization :: String }
 

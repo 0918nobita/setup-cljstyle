@@ -3,6 +3,8 @@ module SetupCljstyle.Installer.Linux
   , installer
   ) where
 
+import Prelude
+
 import Control.Monad.Except (withExceptT)
 import Control.Monad.Reader (ReaderT, ask, asks)
 import Control.Monad.Trans.Class (lift)
@@ -11,7 +13,6 @@ import Effect.Class.Console (log)
 import GitHub.Actions.IO (mkdirP)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Node.Path (FilePath)
-import Prelude
 import SetupCljstyle.Installer (class HasInstaller)
 import Types (AffWithExcept, SingleError(..), URL(..), Version(..))
 

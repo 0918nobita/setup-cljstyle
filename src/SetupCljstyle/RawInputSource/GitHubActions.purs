@@ -1,9 +1,10 @@
 module SetupCljstyle.RawInputSource.GitHubActions where
 
+import Prelude
+
 import Control.Monad.Except (mapExceptT)
 import Effect.Class (liftEffect)
 import GitHub.Actions.Extension (inputExceptT)
-import Prelude
 import SetupCljstyle.RawInputSource (class HasRawInputs)
 import Types (AffWithExcept)
 

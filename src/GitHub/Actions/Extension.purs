@@ -2,25 +2,30 @@ module GitHub.Actions.Extension where
 
 import Prelude
 
-import Control.Monad.Except (ExceptT, mapExceptT, throwError)
-import Control.Monad.Reader (ReaderT, mapReaderT)
-import Control.Monad.Trans.Class (lift)
+import Control.Monad.Except (throwError)
 import Data.Maybe (Maybe(..))
-import Data.String (Pattern(..), Replacement(..), replaceAll, toUpper)
-import Effect.Aff (Aff)
-import GitHub.Actions.Core as Core
+import Data.String (Pattern(..), Replacement(..), replaceAll, toUpper, trim)
+import Effect.Class (liftEffect)
+import Effect.Class.Console (log)
 import Node.Process (lookupEnv)
-import Types (EffectWithExcept, SingleError(..))
+import Types (SingleError(..), AffWithExcept)
 
-inputExceptT :: String -> EffectWithExcept String
-inputExceptT name = do
-  valOpt <- lift $ lookupEnv $ "INPUT_" <> toUpper (replaceAll (Pattern " ") (Replacement "_") name)
+getInput :: String -> AffWithExcept String
+getInput name = do
+  valOpt <-
+    liftEffect
+      $ map (map trim)
+      $ lookupEnv
+      $ "INPUT_" <> toUpper (replaceAll (Pattern " ") (Replacement "_") name)
   case valOpt of
-    Just val -> pure val
-    Nothing -> throwError $ SingleError $ "Failed to get `" <> name <> "` input"
+    Just val ->
+      pure val
+    Nothing ->
+      throwError $ SingleError $ "Failed to get `" <> name <> "` input"
 
-group :: forall a. String -> Aff a -> Aff a
-group name aff = Core.group { name, fn: aff }
-
-group' :: forall r e a. String -> ReaderT r (ExceptT e Aff) a -> ReaderT r (ExceptT e Aff) a
-group' = mapReaderT <<< mapExceptT <<< group
+group :: forall a. String -> AffWithExcept a -> AffWithExcept a
+group name fn = do
+  log $ "::group::" <> name
+  res <- fn
+  log "::endgroup::"
+  pure res

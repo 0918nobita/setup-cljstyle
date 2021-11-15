@@ -2,9 +2,7 @@ module SetupCljstyle.RawInputSource.GitHubActions where
 
 import Prelude
 
-import Control.Monad.Except (mapExceptT)
-import Effect.Class (liftEffect)
-import GitHub.Actions.Extension (inputExceptT)
+import GitHub.Actions.Extension (getInput)
 import SetupCljstyle.RawInputSource (class HasRawInputs)
 import Types (AffWithExcept)
 
@@ -23,7 +21,7 @@ instance HasRawInputs GHARawInputSource where
 
 ghaRawInputSource :: GHARawInputSource
 ghaRawInputSource = GHARawInputSource
-  { cljstyleVersion: mapExceptT liftEffect $ inputExceptT "cljstyle-version"
-  , authToken: mapExceptT liftEffect $ inputExceptT "token"
-  , runCheck: mapExceptT liftEffect $ inputExceptT "run-check"
+  { cljstyleVersion: getInput "cljstyle-version"
+  , authToken: getInput "token"
+  , runCheck: getInput "run-check"
   }

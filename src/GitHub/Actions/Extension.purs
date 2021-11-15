@@ -7,8 +7,19 @@ import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), Replacement(..), replaceAll, toUpper, trim)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (log)
+import Node.Encoding (Encoding(..))
+import Node.FS.Sync (appendTextFile)
 import Node.Process (lookupEnv)
 import Types (SingleError(..), AffWithExcept)
+
+addPath :: String -> AffWithExcept Unit
+addPath path = do
+  filePathOpt <- liftEffect $ lookupEnv "GITHUB_PATH"
+
+  case filePathOpt of
+    Just filePath ->
+      liftEffect $ appendTextFile UTF8 filePath path
+    Nothing -> throwError $ SingleError $ "The GITHUB_PATH environment variable not set"
 
 getInput :: String -> AffWithExcept String
 getInput name = do
@@ -17,6 +28,7 @@ getInput name = do
       $ map (map trim)
       $ lookupEnv
       $ "INPUT_" <> toUpper (replaceAll (Pattern " ") (Replacement "_") name)
+
   case valOpt of
     Just val ->
       pure val

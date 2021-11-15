@@ -15,8 +15,7 @@ import Effect.Class (liftEffect)
 import Effect.Class.Console (errorShow)
 import Fetcher (class Fetcher)
 import Fetcher.Node (NodeFetcher(..))
-import GitHub.Actions.Core (addPath)
-import GitHub.Actions.Extension (group)
+import GitHub.Actions.Extension (addPath, group)
 import Node.Platform (Platform(Win32, Darwin, Linux))
 import Node.Process as Process
 import SetupCljstyle.Cache (cache)
@@ -42,7 +41,7 @@ mainReaderT = do
 
   mapReaderT (group ("Install cljstyle " <> show cljstyleVersion)) do
     cachePath <- withReaderT (\_ -> cljstyleVersion) $ cache <|> runInstaller installer
-    liftEffect $ addPath cachePath
+    lift $ addPath cachePath
 
   lift case runCheck of
     RunCheck _ -> group "Run `cljstyle check`" $ lift $ execCmd "cljstyle" [ "check", "--verbose" ]

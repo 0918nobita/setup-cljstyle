@@ -21,7 +21,7 @@ import Node.Process as Process
 import SetupCljstyle.Cache (cache)
 import SetupCljstyle.Command (execCmd)
 import SetupCljstyle.InputResolver (RunCheckInput(..), resolveInputs)
-import SetupCljstyle.Installer (class HasInstaller, runInstaller)
+import SetupCljstyle.Installer (Installer, runInstaller)
 import SetupCljstyle.Installer.Darwin as Darwin
 import SetupCljstyle.Installer.Linux as Linux
 import SetupCljstyle.Installer.Win32 as Win32
@@ -29,17 +29,16 @@ import SetupCljstyle.RawInputSource (class HasRawInputs, gatherRawInputs)
 import SetupCljstyle.RawInputSource.GitHubActions (ghaRawInputSource)
 import Types (SingleError(..), AffWithExcept)
 
-type Env i r =
+type Env r =
   { fetcher :: TextFetcher
-  , installer :: i
+  , installer :: Installer
   , rawInputSource :: r
   }
 
 mainReaderT
-  :: forall i r
-   . HasInstaller i
-  => HasRawInputs r
-  => ReaderT (Env i r) AffWithExcept Unit
+  :: forall r
+   . HasRawInputs r
+  => ReaderT (Env r) AffWithExcept Unit
 mainReaderT = do
   { installer, rawInputSource } <- ask
 

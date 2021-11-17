@@ -4,6 +4,7 @@ import Control.Monad.Reader (ReaderT)
 import Node.Path (FilePath)
 import Types (AffWithExcept, Version)
 
--- | For dependency injection
-class HasInstaller a where
-  runInstaller :: a -> ReaderT Version AffWithExcept FilePath
+newtype Installer = Installer (ReaderT Version AffWithExcept FilePath)
+
+runInstaller :: Installer -> ReaderT Version AffWithExcept FilePath
+runInstaller (Installer reader) = reader

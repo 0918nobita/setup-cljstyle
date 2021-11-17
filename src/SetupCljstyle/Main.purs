@@ -12,7 +12,7 @@ import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (errorShow, log)
+import Effect.Class.Console (errorShow)
 import Fetcher (TextFetcher)
 import Fetcher.Node (textFetcher)
 import GitHub.Actions.Extension (addPath, group)
@@ -52,7 +52,8 @@ mainReaderT = do
   lift case runCheck of
     RunCheck reviewdogEnabled -> do
       group "Run `cljstyle check`" $ liftEffect $ execCmd "cljstyle check --verbose"
-      if reviewdogEnabled then log "reviewdog enabled"
+      if reviewdogEnabled then
+        liftEffect $ execCmd "cljstyle check --no-color | reviewdog -f=diff -reporter=github-check"
       else mempty
     DontRunCheck -> mempty
 

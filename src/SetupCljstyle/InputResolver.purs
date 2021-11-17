@@ -6,16 +6,18 @@ module SetupCljstyle.InputResolver
 import Prelude
 
 import Control.Alt ((<|>))
-import Control.Monad.Except (except, throwError)
+import Control.Monad.Except (except, mapExceptT, throwError, withExceptT)
 import Control.Monad.Reader (ReaderT, ask, withReaderT)
 import Control.Monad.Trans.Class (lift)
-import Data.Argonaut (class DecodeJson, decodeJson, jsonParser, (.:))
+import Data.Argonaut (class DecodeJson, decodeJson, (.:))
 import Data.Argonaut.Decode.Decoders (decodeBoolean, decodeJObject)
 import Data.Either (Either)
 import Data.EitherR (fmapL)
+import Data.Identity (Identity(..))
 import Data.String (null)
 import Data.String.Regex (Regex, test, regex)
 import Data.String.Regex.Flags (noFlags)
+import Data.YAML.Foreign.Decode (parseYAMLToJson)
 import Effect.Class.Console (log)
 import Fetcher (class Fetcher)
 import GitHub.RestApi.Releases (fetchLatestRelease)
@@ -88,7 +90,10 @@ resolveRunCheckInput = do
   { runCheck } <- ask
 
   lift do
-    parsed <- except $ jsonParser runCheck # fmapL \_ -> SingleError "Failed to parse `run-check` input"
+    parsed <-
+      parseYAMLToJson runCheck
+        # withExceptT (\_ -> SingleError "Failed to parse `run-check` input as YAML string")
+        # mapExceptT \(Identity a) -> pure a
 
     except $ decodeJson parsed # fmapL \_ -> SingleError "The format of `run-check` input is invalid."
 

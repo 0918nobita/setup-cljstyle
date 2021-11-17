@@ -9,6 +9,7 @@
   , "either"
   , "errors"
   , "github-actions-toolkit"
+  , "identity"
   , "maybe"
   , "node-buffer"
   , "node-child-process"

@@ -9,12 +9,12 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import SetupCljstyle.InputResolver (RunCheckInput(..), resolveInputs)
 import SetupCljstyle.RawInputSource (gatherRawInputs)
-import Test.Fetcher (TestFetcher(..))
+import Test.Fetcher (testTextFetcher)
+import Test.RawInputSource (testRawInputSource)
 import Test.Spec (describe, it)
 import Test.Spec.Assertions (shouldEqual)
 import Test.Spec.Reporter.Console (consoleReporter)
 import Test.Spec.Runner (runSpec)
-import Test.RawInputSource (testRawInputSource)
 import Types (SingleError(..), Version(..))
 
 main :: Effect Unit
@@ -30,7 +30,7 @@ main = do
 
     describe "InputResolver" do
       describe "resolveInputs" do
-        let fetcher = TestFetcher "{\"tag_name\":\"0.15.0\"}"
+        let fetcher = testTextFetcher "{\"tag_name\":\"0.15.0\"}"
 
         it "when the cljstyle's version is specified" do
           result <- runExceptT do

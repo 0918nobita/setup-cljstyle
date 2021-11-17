@@ -13,8 +13,8 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (errorShow)
-import Fetcher (class Fetcher)
-import Fetcher.Node (NodeFetcher(..))
+import Fetcher (TextFetcher)
+import Fetcher.Node (nodeTextFetcher)
 import GitHub.Actions.Extension (addPath, group)
 import Node.Platform (Platform(Win32, Darwin, Linux))
 import Node.Process as Process
@@ -29,18 +29,17 @@ import SetupCljstyle.RawInputSource (class HasRawInputs, gatherRawInputs)
 import SetupCljstyle.RawInputSource.GitHubActions (ghaRawInputSource)
 import Types (SingleError(..), AffWithExcept)
 
-type Env f i r =
-  { fetcher :: f
+type Env i r =
+  { fetcher :: TextFetcher
   , installer :: i
   , rawInputSource :: r
   }
 
 mainReaderT
-  :: forall f i r
-   . Fetcher f
-  => HasInstaller i
+  :: forall i r
+   . HasInstaller i
   => HasRawInputs r
-  => ReaderT (Env f i r) AffWithExcept Unit
+  => ReaderT (Env i r) AffWithExcept Unit
 mainReaderT = do
   { installer, rawInputSource } <- ask
 
@@ -60,21 +59,21 @@ mainReaderT = do
 
 mainWin32 :: AffWithExcept Unit
 mainWin32 = runReaderT mainReaderT
-  { fetcher: NodeFetcher
+  { fetcher: nodeTextFetcher
   , installer: Win32.installer
   , rawInputSource: ghaRawInputSource
   }
 
 mainDarwin :: AffWithExcept Unit
 mainDarwin = runReaderT mainReaderT
-  { fetcher: NodeFetcher
+  { fetcher: nodeTextFetcher
   , installer: Darwin.installer
   , rawInputSource: ghaRawInputSource
   }
 
 mainLinux :: AffWithExcept Unit
 mainLinux = runReaderT mainReaderT
-  { fetcher: NodeFetcher
+  { fetcher: nodeTextFetcher
   , installer: Linux.installer
   , rawInputSource: ghaRawInputSource
   }

@@ -2,9 +2,7 @@ module Test.Fetcher where
 
 import Prelude
 
-import Fetcher (class Fetcher)
+import Fetcher (TextFetcher(..))
 
-data TestFetcher = TestFetcher String
-
-instance Fetcher TestFetcher where
-  getText (TestFetcher resBody) _ = pure resBody
+testTextFetcher :: String -> TextFetcher
+testTextFetcher resBody = TextFetcher (\_ -> pure resBody)

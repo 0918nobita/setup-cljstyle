@@ -19,13 +19,13 @@ import Data.String.Regex (Regex, test, regex)
 import Data.String.Regex.Flags (noFlags)
 import Data.YAML.Foreign.Decode (parseYAMLToJson)
 import Effect.Class.Console (log)
-import Fetcher (class Fetcher)
+import Fetcher (TextFetcher)
 import GitHub.RestApi.Releases (fetchLatestRelease)
 import SetupCljstyle.RawInputSource (RawInputs)
 import Types (AffWithExcept, SingleError(..), Version(..))
 
-type Env f =
-  { fetcher :: f
+type Env =
+  { fetcher :: TextFetcher
   , rawInputs :: RawInputs
   }
 
@@ -34,7 +34,7 @@ versionRegex =
   regex "^([1-9]\\d*|0)\\.([1-9]\\d*|0)\\.([1-9]\\d*|0)$" noFlags
     # fmapL SingleError
 
-tryGetSpecifiedVersion :: forall f. ReaderT (Env f) AffWithExcept Version
+tryGetSpecifiedVersion :: ReaderT Env AffWithExcept Version
 tryGetSpecifiedVersion = do
   { rawInputs: { cljstyleVersion: version } } <- ask
 
@@ -49,14 +49,14 @@ tryGetSpecifiedVersion = do
       else
         throwError $ SingleError "The format of cljstyle-version is invalid."
 
-tryGetLatestVersion :: forall f. Fetcher f => ReaderT (Env f) AffWithExcept Version
+tryGetLatestVersion :: ReaderT Env AffWithExcept Version
 tryGetLatestVersion = do
   { fetcher, rawInputs: { authToken } } <- ask
 
   log "Attempt to fetch the latest version of cljstyle by calling GitHub REST API"
   lift $ fetchLatestRelease fetcher { authToken, owner: "greglook", repo: "cljstyle" }
 
-resolveCljstyleVersionInput :: forall f. Fetcher f => ReaderT (Env f) AffWithExcept Version
+resolveCljstyleVersionInput :: ReaderT Env AffWithExcept Version
 resolveCljstyleVersionInput = tryGetSpecifiedVersion <|> tryGetLatestVersion
 
 data RunCheckInput
@@ -102,7 +102,7 @@ type Inputs =
   , runCheck :: RunCheckInput
   }
 
-resolveInputs :: forall f. Fetcher f => ReaderT (Env f) AffWithExcept Inputs
+resolveInputs :: ReaderT Env AffWithExcept Inputs
 resolveInputs = do
   cljstyleVersion <- resolveCljstyleVersionInput
   runCheck <- withReaderT _.rawInputs resolveRunCheckInput

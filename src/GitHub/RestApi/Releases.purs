@@ -7,7 +7,7 @@ import Prelude
 import Control.Monad.Except (except)
 import Data.Argonaut (decodeJson, jsonParser, printJsonDecodeError)
 import Data.EitherR (fmapL)
-import Fetcher (class Fetcher, getText)
+import Fetcher (TextFetcher, fetchText)
 import Types (AffWithExcept, SingleError(..), Version(..))
 
 type Release = { tag_name :: String }
@@ -18,10 +18,10 @@ type FetchLatestReleaseArgs =
   , repo :: String
   }
 
-fetchLatestRelease :: forall a. Fetcher a => a -> FetchLatestReleaseArgs -> AffWithExcept Version
+fetchLatestRelease :: TextFetcher -> FetchLatestReleaseArgs -> AffWithExcept Version
 fetchLatestRelease fetcher { authToken, owner, repo } = do
   let url = "https://api.github.com/repos/" <> owner <> "/" <> repo <> "/releases/latest"
-  resBody <- getText fetcher { url, authorization: "Bearer " <> authToken }
+  resBody <- fetchText fetcher { url, authorization: "Bearer " <> authToken }
 
   parsed <- except $ jsonParser resBody # fmapL SingleError
 

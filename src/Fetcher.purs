@@ -2,5 +2,9 @@ module Fetcher where
 
 import Types (AffWithExcept)
 
-class Fetcher a where
-  getText :: a -> { url :: String, authorization :: String } -> AffWithExcept String
+type FetchTextArgs = { url :: String, authorization :: String }
+
+newtype TextFetcher = TextFetcher (FetchTextArgs -> AffWithExcept String)
+
+fetchText :: TextFetcher -> FetchTextArgs -> AffWithExcept String
+fetchText (TextFetcher fn) = fn

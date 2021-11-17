@@ -1,6 +1,6 @@
 const https = require('https');
 
-exports._getTextImpl =
+exports._fetchTextImpl =
   ({ url, authorization }) => (onError, onSuccess) => {
     https.get(
       url,

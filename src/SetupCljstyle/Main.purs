@@ -55,7 +55,7 @@ mainReaderT = do
     lift $ addPath cachePath
 
   lift case runCheck of
-    RunCheck _ -> group "Run `cljstyle check`" $ lift $ execCmd "cljstyle" [ "check", "--verbose" ]
+    RunCheck _ -> group "Run `cljstyle check`" $ liftEffect $ execCmd "cljstyle check --verbose"
     DontRunCheck -> mempty
 
 mainWin32 :: AffWithExcept Unit

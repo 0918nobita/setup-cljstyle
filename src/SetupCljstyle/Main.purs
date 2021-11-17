@@ -51,10 +51,12 @@ mainReaderT = do
 
   lift case runCheck of
     RunCheck reviewdogEnabled -> do
-      group "Run `cljstyle check`" $ liftEffect $ execCmd "cljstyle check --verbose"
-      if reviewdogEnabled then
-        liftEffect $ execCmd "cljstyle check --no-color | reviewdog -f=diff -reporter=github-check"
-      else mempty
+      group "Run `cljstyle check`" $
+        liftEffect
+          if reviewdogEnabled then
+            execCmd "cljstyle check --no-color | reviewdog -f=diff -reporter=github-check"
+          else
+            execCmd "cljstyle check --verbose"
     DontRunCheck -> mempty
 
 main :: Effect Unit

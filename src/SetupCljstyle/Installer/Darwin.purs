@@ -1,7 +1,8 @@
 module SetupCljstyle.Installer.Darwin
-  ( InstallerForDarwin
-  , installer
+  ( installer
   ) where
+
+import Prelude
 
 import Control.Monad.Except (withExceptT)
 import Control.Monad.Reader (ReaderT, ask, asks)
@@ -10,8 +11,7 @@ import Data.Maybe (Maybe(..))
 import Effect.Class.Console (log)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Node.Path (FilePath)
-import Prelude
-import SetupCljstyle.Installer (class HasInstaller)
+import SetupCljstyle.Installer (Installer(..))
 import Types (AffWithExcept, SingleError(..), URL(..), Version(..))
 
 downloadUrl :: Version -> URL
@@ -36,8 +36,8 @@ extractCljstyleTar { tarPath, binDir } = do
   extractTar { file: tarPath, dest: Just binDir, flags: Nothing }
     # withExceptT \_ -> SingleError $ "Failed to extract " <> tarPath
 
-installBin :: ReaderT Version AffWithExcept FilePath
-installBin = do
+installer :: Installer
+installer = Installer do
   let binDir = "/usr/local/bin"
   tarPath <- downloadTar
 
@@ -51,13 +51,3 @@ installBin = do
       # withExceptT \_ -> SingleError $ "Failed to extract " <> extractedDir
 
     pure extractedDir
-
-newtype InstallerForDarwin = InstallerForDarwin
-  { run :: ReaderT Version AffWithExcept FilePath
-  }
-
-instance HasInstaller InstallerForDarwin where
-  runInstaller (InstallerForDarwin { run }) = run
-
-installer :: InstallerForDarwin
-installer = InstallerForDarwin { run: installBin }

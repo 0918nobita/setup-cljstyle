@@ -27,7 +27,7 @@ jobs:
           cljstyle-version: "0.14.0"
       - run: cljstyle version
 
-  use-on-linux:
+  use-on-linux-1:
     runs-on: ubuntu-latest
     name: Use this action on Linux
     steps:
@@ -35,4 +35,31 @@ jobs:
       - uses: ./
         with:
           run-check: true
+      - run: cljstyle version
+
+  use-on-linux-2:
+    runs-on: ubuntu-latest
+    name: Enable reviewdog
+    steps:
+      - uses: actions/checkout@v2
+      - uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+      - uses: ./
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          run-check: |
+            reviewdog-enabled: true
+      - run: cljstyle version
+
+  use-on-linux-3:
+    runs-on: ubuntu-latest
+    name: Disable reviewdog
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          run-check: |
+            reviewdog-enabled: false
       - run: cljstyle version

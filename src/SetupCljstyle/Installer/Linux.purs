@@ -1,7 +1,8 @@
 module SetupCljstyle.Installer.Linux
-  ( InstallerForLinux
-  , installer
+  ( installer
   ) where
+
+import Prelude
 
 import Control.Monad.Except (withExceptT)
 import Control.Monad.Reader (ReaderT, ask, asks)
@@ -11,8 +12,7 @@ import Effect.Class.Console (log)
 import GitHub.Actions.IO (mkdirP)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool, extractTar)
 import Node.Path (FilePath)
-import Prelude
-import SetupCljstyle.Installer (class HasInstaller)
+import SetupCljstyle.Installer (Installer(..))
 import Types (AffWithExcept, SingleError(..), URL(..), Version(..))
 
 binDir :: String
@@ -42,8 +42,8 @@ extractCljstyleTar tarPath = do
   extractTar { file: tarPath, dest: Just binDir, flags: Nothing }
     # withExceptT \_ -> SingleError $ "Failed to extract " <> tarPath
 
-installBin :: ReaderT Version AffWithExcept FilePath
-installBin = do
+installer :: Installer
+installer = Installer do
   tarPath <- downloadTar
 
   Version version <- ask
@@ -56,13 +56,3 @@ installBin = do
       # withExceptT \_ -> SingleError $ "Failed to cache " <> extractedDir
 
     pure extractedDir
-
-newtype InstallerForLinux = InstallerForLinux
-  { run :: ReaderT Version AffWithExcept FilePath
-  }
-
-instance HasInstaller InstallerForLinux where
-  runInstaller (InstallerForLinux { run }) = run
-
-installer :: InstallerForLinux
-installer = InstallerForLinux { run: installBin }

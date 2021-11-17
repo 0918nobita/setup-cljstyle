@@ -1,19 +1,43 @@
 module GitHub.Actions.Extension where
 
-import Control.Monad.Except (ExceptT, mapExceptT, withExceptT)
-import Data.Maybe (Maybe(Nothing))
-import Effect.Aff (Aff)
-import GitHub.Actions.Core as Core
 import Prelude
-import Types (EffectWithExcept, SingleError(..))
 
-inputExceptT :: String -> EffectWithExcept String
-inputExceptT name =
-  Core.getInput { name, options: Nothing }
-    # withExceptT \_ -> SingleError $ "Failed to get `" <> name <> "` input"
+import Control.Monad.Except (throwError)
+import Data.Maybe (Maybe(..))
+import Data.String (Pattern(..), Replacement(..), replaceAll, toUpper, trim)
+import Effect.Class (liftEffect)
+import Effect.Class.Console (log)
+import Node.Encoding (Encoding(..))
+import Node.FS.Sync (appendTextFile)
+import Node.Process (lookupEnv)
+import Types (SingleError(..), AffWithExcept)
 
-group :: forall a. String -> Aff a -> Aff a
-group name aff = Core.group { name, fn: aff }
+addPath :: String -> AffWithExcept Unit
+addPath path = do
+  filePathOpt <- liftEffect $ lookupEnv "GITHUB_PATH"
 
-groupExceptT :: forall e a. String -> ExceptT e Aff a -> ExceptT e Aff a
-groupExceptT = mapExceptT <<< group
+  case filePathOpt of
+    Just filePath ->
+      liftEffect $ appendTextFile UTF8 filePath path
+    Nothing -> throwError $ SingleError $ "The GITHUB_PATH environment variable not set"
+
+getInput :: String -> AffWithExcept String
+getInput name = do
+  valOpt <-
+    liftEffect
+      $ map (map trim)
+      $ lookupEnv
+      $ "INPUT_" <> toUpper (replaceAll (Pattern " ") (Replacement "_") name)
+
+  case valOpt of
+    Just val ->
+      pure val
+    Nothing ->
+      throwError $ SingleError $ "Failed to get `" <> name <> "` input"
+
+group :: forall a. String -> AffWithExcept a -> AffWithExcept a
+group name fn = do
+  log $ "::group::" <> name
+  res <- fn
+  log "::endgroup::"
+  pure res

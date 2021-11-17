@@ -1,9 +1,10 @@
 module Types where
 
+import Prelude
+
 import Control.Monad.Except (ExceptT)
 import Effect (Effect)
 import Effect.Aff (Aff)
-import Prelude
 
 type EffectWithExcept = ExceptT (SingleError String) Effect
 

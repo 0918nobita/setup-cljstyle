@@ -1,21 +1,18 @@
 module Fetcher.Node
-  ( NodeFetcher(..)
+  ( textFetcher
   ) where
+
+import Prelude
 
 import Control.Monad.Trans.Class (lift)
 import Effect.Aff (Aff)
 import Effect.Aff.Compat (EffectFnAff, fromEffectFnAff)
-import Fetcher (class Fetcher)
-import Prelude
+import Fetcher (TextFetcher(..), FetchTextArgs)
 
-type GetTextArgs = { url :: String, authorization :: String }
+foreign import _fetchTextImpl :: FetchTextArgs -> EffectFnAff String
 
-foreign import _getTextImpl :: GetTextArgs -> EffectFnAff String
+fetchTextImpl :: FetchTextArgs -> Aff String
+fetchTextImpl = fromEffectFnAff <<< _fetchTextImpl
 
-getTextImpl :: GetTextArgs -> Aff String
-getTextImpl = fromEffectFnAff <<< _getTextImpl
-
-data NodeFetcher = NodeFetcher
-
-instance Fetcher NodeFetcher where
-  getText NodeFetcher = lift <<< getTextImpl
+textFetcher :: TextFetcher
+textFetcher = TextFetcher (lift <<< fetchTextImpl)

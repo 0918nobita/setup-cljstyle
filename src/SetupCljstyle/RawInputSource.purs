@@ -8,5 +8,7 @@ type RawInputs =
   , runCheck :: String
   }
 
-class HasRawInputs a where
-  gatherRawInputs :: a -> AffWithExcept RawInputs
+newtype RawInputSource = RawInputSource (AffWithExcept RawInputs)
+
+gatherRawInputs :: RawInputSource -> AffWithExcept RawInputs
+gatherRawInputs (RawInputSource aff) = aff

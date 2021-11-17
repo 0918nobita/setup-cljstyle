@@ -1,7 +1,8 @@
 module SetupCljstyle.Installer.Win32
-  ( InstallerForWin32
-  , installer
+  ( installer
   ) where
+
+import Prelude
 
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Except (withExceptT)
@@ -12,9 +13,8 @@ import Effect.Class.Console (log)
 import GitHub.Actions.ToolCache (cacheDir, downloadTool)
 import Node.Encoding (Encoding(UTF8))
 import Node.FS.Sync (writeTextFile)
-import Node.Path (FilePath, concat)
-import Prelude
-import SetupCljstyle.Installer (class HasInstaller)
+import Node.Path (concat)
+import SetupCljstyle.Installer (Installer(..))
 import Types (AffWithExcept, SingleError(..), URL(..), Version(..))
 
 binDir :: String
@@ -42,8 +42,8 @@ downloadJar = do
         }
         # withExceptT \_ -> SingleError $ "Failed to download " <> url
 
-installBin :: ReaderT Version AffWithExcept FilePath
-installBin = do
+installer :: Installer
+installer = Installer do
   downloadJar
 
   version <- ask
@@ -60,13 +60,3 @@ installBin = do
       # withExceptT \_ -> SingleError $ "Failed to cache " <> binDir
 
     pure binDir
-
-newtype InstallerForWin32 = InstallerForWin32
-  { run :: ReaderT Version AffWithExcept FilePath
-  }
-
-instance HasInstaller InstallerForWin32 where
-  runInstaller (InstallerForWin32 { run }) = run
-
-installer :: InstallerForWin32
-installer = InstallerForWin32 { run: installBin }

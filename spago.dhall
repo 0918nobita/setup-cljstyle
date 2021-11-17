@@ -9,18 +9,19 @@
   , "either"
   , "errors"
   , "github-actions-toolkit"
+  , "identity"
   , "maybe"
   , "node-buffer"
   , "node-child-process"
   , "node-fs"
   , "node-path"
   , "node-process"
-  , "node-streams"
   , "prelude"
   , "psci-support"
   , "spec"
   , "strings"
   , "transformers"
+  , "yaml-next"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

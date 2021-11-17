@@ -1,5 +1,5 @@
 module Fetcher.Node
-  ( nodeTextFetcher
+  ( textFetcher
   ) where
 
 import Prelude
@@ -14,5 +14,5 @@ foreign import _fetchTextImpl :: FetchTextArgs -> EffectFnAff String
 fetchTextImpl :: FetchTextArgs -> Aff String
 fetchTextImpl = fromEffectFnAff <<< _fetchTextImpl
 
-nodeTextFetcher :: TextFetcher
-nodeTextFetcher = TextFetcher (lift <<< fetchTextImpl)
+textFetcher :: TextFetcher
+textFetcher = TextFetcher (lift <<< fetchTextImpl)

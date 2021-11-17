@@ -53,36 +53,18 @@ mainReaderT = do
     RunCheck _ -> group "Run `cljstyle check`" $ liftEffect $ execCmd "cljstyle check --verbose"
     DontRunCheck -> mempty
 
-mainWin32 :: AffWithExcept Unit
-mainWin32 = runReaderT mainReaderT
-  { fetcher: textFetcher
-  , installer: Win32.installer
-  , rawInputSource
-  }
-
-mainDarwin :: AffWithExcept Unit
-mainDarwin = runReaderT mainReaderT
-  { fetcher: textFetcher
-  , installer: Darwin.installer
-  , rawInputSource
-  }
-
-mainLinux :: AffWithExcept Unit
-mainLinux = runReaderT mainReaderT
-  { fetcher: textFetcher
-  , installer: Linux.installer
-  , rawInputSource
-  }
-
 main :: Effect Unit
 main =
   launchAff_ $ runExceptT $ catchError mainAff' handleError
   where
-  mainAff' = case Process.platform of
-    Just Win32 -> mainWin32
-    Just Darwin -> mainDarwin
-    Just Linux -> mainLinux
-    Just _ -> throwError $ SingleError "Unsupported platform"
-    Nothing -> throwError $ SingleError "Failed to identify platform"
+  mainAff' = do
+    installer <-
+      case Process.platform of
+        Just Win32 -> pure Win32.installer
+        Just Darwin -> pure Darwin.installer
+        Just Linux -> pure Linux.installer
+        Just _ -> throwError $ SingleError "Unsupported platform"
+        Nothing -> throwError $ SingleError "Failed to identify platform"
+    runReaderT mainReaderT { fetcher: textFetcher, installer, rawInputSource }
 
   handleError msg = liftEffect $ errorShow msg *> Process.exit 1

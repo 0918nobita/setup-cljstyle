@@ -12,7 +12,7 @@ import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (errorShow)
+import Effect.Class.Console (errorShow, log)
 import Fetcher (TextFetcher)
 import Fetcher.Node (textFetcher)
 import GitHub.Actions.Extension (addPath, group)
@@ -50,7 +50,10 @@ mainReaderT = do
     lift $ addPath cachePath
 
   lift case runCheck of
-    RunCheck _ -> group "Run `cljstyle check`" $ liftEffect $ execCmd "cljstyle check --verbose"
+    RunCheck reviewdogEnabled -> do
+      group "Run `cljstyle check`" $ liftEffect $ execCmd "cljstyle check --verbose"
+      if reviewdogEnabled then log "reviewdog enabled"
+      else mempty
     DontRunCheck -> mempty
 
 main :: Effect Unit
@@ -58,13 +61,12 @@ main =
   launchAff_ $ runExceptT $ catchError mainAff' handleError
   where
   mainAff' = do
-    installer <-
-      case Process.platform of
-        Just Win32 -> pure Win32.installer
-        Just Darwin -> pure Darwin.installer
-        Just Linux -> pure Linux.installer
-        Just _ -> throwError $ SingleError "Unsupported platform"
-        Nothing -> throwError $ SingleError "Failed to identify platform"
+    installer <- case Process.platform of
+      Just Win32 -> pure Win32.installer
+      Just Darwin -> pure Darwin.installer
+      Just Linux -> pure Linux.installer
+      Just _ -> throwError $ SingleError "Unsupported platform"
+      Nothing -> throwError $ SingleError "Failed to identify platform"
     runReaderT mainReaderT { fetcher: textFetcher, installer, rawInputSource }
 
   handleError msg = liftEffect $ errorShow msg *> Process.exit 1

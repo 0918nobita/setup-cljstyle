@@ -54,7 +54,7 @@ mainReaderT = do
       group "Run `cljstyle check`" $
         liftEffect
           if reviewdogEnabled then
-            execCmd "cljstyle check --no-color | reviewdog -f=diff -reporter=github-check"
+            execCmd "cljstyle check --no-color | reviewdog -f=diff -reporter=github-check -filter-mode nofilter"
           else
             execCmd "cljstyle check --verbose"
     DontRunCheck -> mempty

@@ -1,8 +1,1 @@
-/.spago
-/dce-output
-/node_modules
-/output
-/.psc-ide-port
-/.psci_modules
-/.purs-repl
-/setup-cljstyle.js
+node_modules

@@ -2,27 +2,15 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "compile": "spago build --purs-args \"--codegen corefn,js\" && zephyr SetupCljstyle.Main.main",
-    "bundle": "esbuild --platform=node --target=node12 --minify --bundle src/bootstrap.js | uglifyjs -c -m -o setup-cljstyle.js",
-    "build": "pnpm compile && pnpm bundle",
-    "lint": "purs-tidy check src test",
-    "format": "purs-tidy format-in-place src test",
-    "test": "spago test",
-    "build-example": "esbuild --platform=node --target=node12 --bundle --minify example.js --outfile=bundle.js"
+    "build": "esbuild --platform=node --target=node12 --bundle --minify example.ts --outfile=bundle.js"
   },
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.0",
-    "@actions/io": "^1.1.1",
-    "@actions/tool-cache": "^1.7.1",
-    "js-yaml": "^4.1.0",
     "parse-diff": "^0.9.0"
   },
   "devDependencies": {
     "esbuild": "^0.14.5",
-    "purescript": "^0.14.5",
-    "purs-tidy": "^0.6.4",
-    "spago": "^0.20.3",
-    "uglify-js": "^3.14.5"
+    "typescript": "^4.5.4"
   }
 }

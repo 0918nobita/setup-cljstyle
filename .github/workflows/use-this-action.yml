@@ -6,38 +6,7 @@ on:
       - 'release/**'
 
 jobs:
-  # use-on-windows:
-  #   runs-on: windows-latest
-  #   name: Use this action on Windows
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: ./
-  #       with:
-  #         cljstyle-version: "0.15.0"
-  #     - run: "ls \"D:\\cljstyle\""
-  #     - run: cljstyle version
-
-  # use-on-macOS:
-  #   runs-on: macos-latest
-  #   name: Use this action on macOS
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: ./
-  #       with:
-  #         cljstyle-version: "0.14.0"
-  #     - run: cljstyle version
-
-  # use-on-linux-1:
-  #   runs-on: ubuntu-latest
-  #   name: Use this action on Linux
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: ./
-  #       with:
-  #         run-check: true
-  #     - run: cljstyle version
-
-  use-on-linux-2:
+  use-on-linux:
     runs-on: ubuntu-latest
     name: Enable diff report
     steps:
@@ -46,15 +15,3 @@ jobs:
         with:
           run-check: |
             diff-report: true
-      # - run: cljstyle version
-
-  # use-on-linux-3:
-  #   runs-on: ubuntu-latest
-  #   name: Disable diff report
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: ./
-  #       with:
-  #         run-check: |
-  #           diff-report: false
-  #     - run: cljstyle version

@@ -20,22 +20,13 @@ jobs:
         with:
           version: "6.20.1"
           run_install: true
-      - name: Install zephyr
-        run: |
-          wget --quiet https://github.com/coot/zephyr/releases/download/c074270/Linux.tar.gz
-          tar -zxvf Linux.tar.gz
-          echo "$(realpath ./zephyr)" >> $GITHUB_PATH
-      - run: zephyr --version
-      - name: Build
-        run: pnpm build
-      - name: Commit and push setup-cljstyle.js
+      - name: Commit and push
         run: |
           find . -maxdepth 1 \( -type d -o -type f \) ! -name "." \
-            | sed '/LICENSE\|README.md\|DEVGUIDE.md\|.git\|.github\|example\|action.yml\|setup-cljstyle.js\|bundle.js/d' \
+            | sed '/LICENSE\|README.md\|DEVGUIDE.md\|.git\|.github\|example\|action.yml\|bundle.js/d' \
             | xargs rm -rf
           BRANCH_NAME="release/${GITHUB_REF#refs/heads/}"
           git checkout -b $BRANCH_NAME
           git add .
-          git add -f setup-cljstyle.js
           git commit -m ":robot: Build setup-cljstyle action"
           git push origin $BRANCH_NAME -f

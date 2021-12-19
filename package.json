@@ -2,15 +2,25 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "esbuild --platform=node --target=node12 --bundle --minify example.ts --outfile=bundle.js"
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel"
   },
-  "dependencies": {
-    "@actions/core": "^1.6.0",
-    "@actions/github": "^5.0.0",
-    "parse-diff": "^0.9.0"
+  "turbo": {
+    "baseBranch": "origin/main",
+    "pipeline": {
+      "build": {
+        "dependsOn": [
+          "^build"
+        ]
+      },
+      "dev": {
+        "cache": false
+      }
+    }
   },
   "devDependencies": {
-    "esbuild": "^0.14.5",
+    "eslint": "^8.5.0",
+    "turbo": "^1.0.19",
     "typescript": "^4.5.4"
   }
 }

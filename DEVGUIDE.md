@@ -2,8 +2,8 @@
 
 ## Requirements
 
+- [Node.js](https://nodejs.org)
 - [pnpm](https://pnpm.io)
-- [zephyr](https://github.com/coot/zephyr)
 
 ## Install dependencies
 
@@ -17,20 +17,8 @@ pnpm install
 pnpm build
 ```
 
-## Lint
+watch mode:
 
 ```bash
-pnpm lint
-```
-
-## Format code
-
-```bash
-pnpm format
-```
-
-## Run tests
-
-```bash
-pnpm test
+pnpm dev
 ```

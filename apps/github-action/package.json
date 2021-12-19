@@ -1,0 +1,18 @@
+{
+  "name": "@setup-cljstyle/github-action",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "ts-eager ./scripts/build.ts",
+    "dev": "ts-eager ./scripts/dev.ts"
+  },
+  "dependencies": {
+    "@setup-cljstyle/commit-comment": "*"
+  },
+  "devDependencies": {
+    "@setup-cljstyle/config": "*",
+    "@types/node": "^17.0.0",
+    "esbuild": "^0.14.5",
+    "ts-eager": "^2.0.2"
+  }
+}

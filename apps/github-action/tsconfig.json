@@ -1,0 +1,7 @@
+{
+  "extends": "@setup-cljstyle/config/tsconfig",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true
+  }
+}

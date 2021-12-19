@@ -1,0 +1,20 @@
+{
+  "name": "@setup-cljstyle/commit-comment",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "dist/main.d.ts",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0",
+    "parse-diff": "^0.9.0"
+  },
+  "devDependencies": {
+    "@setup-cljstyle/config": "*"
+  }
+}

@@ -1,5 +1,6 @@
 module SetupCljstyle.InputResolver
-  ( RunCheckInput(..)
+  ( DiffReportConfig(..)
+  , RunCheckInput(..)
   , resolveInputs
   ) where
 
@@ -59,8 +60,17 @@ tryGetLatestVersion = do
 resolveCljstyleVersionInput :: ReaderT Env AffWithExcept Version
 resolveCljstyleVersionInput = tryGetSpecifiedVersion <|> tryGetLatestVersion
 
+data DiffReportConfig
+  = DiffReportEnabled
+  | DiffReportDisabled
+
+instance Eq DiffReportConfig where
+  eq DiffReportEnabled DiffReportEnabled = true
+  eq DiffReportDisabled DiffReportDisabled = true
+  eq _ _ = false
+
 data RunCheckInput
-  = RunCheck Boolean
+  = RunCheck DiffReportConfig
   | DontRunCheck
 
 instance Eq RunCheckInput where
@@ -69,8 +79,8 @@ instance Eq RunCheckInput where
   eq _ _ = false
 
 instance Show RunCheckInput where
-  show (RunCheck true) = "RunCheck(reviewdog integration enabled)"
-  show (RunCheck false) = "RunCheck(reviewdog integration disabled)"
+  show (RunCheck DiffReportEnabled) = "RunCheck(reviewdog integration enabled)"
+  show (RunCheck DiffReportDisabled) = "RunCheck(reviewdog integration disabled)"
   show (DontRunCheck) = "DontRunCheck"
 
 instance DecodeJson RunCheckInput where
@@ -78,12 +88,12 @@ instance DecodeJson RunCheckInput where
     where
     booleanFormat j = do
       bool <- decodeBoolean j
-      pure if bool then RunCheck false else DontRunCheck
+      pure if bool then RunCheck DiffReportDisabled else DontRunCheck
 
     objectFormat j = do
       obj <- decodeJObject j
-      reviewdogEnabled :: Boolean <- obj .: "reviewdog-enabled"
-      pure $ RunCheck reviewdogEnabled
+      diffReportEnabled :: Boolean <- obj .: "diff-report"
+      pure $ RunCheck if diffReportEnabled then DiffReportEnabled else DiffReportDisabled
 
 resolveRunCheckInput :: ReaderT RawInputs AffWithExcept RunCheckInput
 resolveRunCheckInput = do

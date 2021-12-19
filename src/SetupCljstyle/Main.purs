@@ -20,7 +20,7 @@ import Node.Platform (Platform(Win32, Darwin, Linux))
 import Node.Process as Process
 import SetupCljstyle.Cache (cache)
 import SetupCljstyle.Command (execCmd)
-import SetupCljstyle.InputResolver (RunCheckInput(..), resolveInputs)
+import SetupCljstyle.InputResolver (DiffReportConfig(..), RunCheckInput(..), resolveInputs)
 import SetupCljstyle.Installer (Installer, runInstaller)
 import SetupCljstyle.Installer.Darwin as Darwin
 import SetupCljstyle.Installer.Linux as Linux
@@ -50,13 +50,14 @@ mainReaderT = do
     lift $ addPath cachePath
 
   lift case runCheck of
-    RunCheck reviewdogEnabled -> do
-      group "Run `cljstyle check`" $
-        liftEffect
-          if reviewdogEnabled then
-            execCmd "cljstyle check --no-color | reviewdog -f=diff -reporter=github-check -filter-mode nofilter"
-          else
-            execCmd "cljstyle check --verbose"
+    RunCheck DiffReportEnabled ->
+      group "Run `cljstyle check`"
+        $ liftEffect
+        $ execCmd "cljstyle check"
+    RunCheck DiffReportDisabled ->
+      group "Run `cljstyle check`"
+        $ liftEffect
+        $ execCmd "cljstyle check --verbose"
     DontRunCheck -> mempty
 
 main :: Effect Unit

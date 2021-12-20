@@ -7,6 +7,11 @@
     "format:check": "prettier --check \"**/*.js\"",
     "format:write": "prettier --write \"**/*.js\""
   },
+  "files": [
+    "eslint.js",
+    "prettier.js",
+    "tsconfig.base.json"
+  ],
   "devDependencies": {
     "eslint": "*",
     "eslint-config-prettier": "*",

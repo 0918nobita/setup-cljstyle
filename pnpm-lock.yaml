@@ -24,6 +24,7 @@ importers:
     specifiers:
       '@setup-cljstyle/commit-comment': '*'
       '@setup-cljstyle/config': '*'
+      '@setup-cljstyle/domain-models': '*'
       '@types/node': ^17.0.0
       '@typescript-eslint/eslint-plugin': '*'
       '@typescript-eslint/parser': '*'
@@ -35,6 +36,7 @@ importers:
       typescript: '*'
     dependencies:
       '@setup-cljstyle/commit-comment': link:../../packages/commit-comment
+      '@setup-cljstyle/domain-models': link:../../packages/domain-models
     devDependencies:
       '@setup-cljstyle/config': link:../../packages/config
       '@types/node': 17.0.0
@@ -81,6 +83,24 @@ importers:
       eslint: 8.5.0
       eslint-config-prettier: 8.3.0_eslint@8.5.0
       prettier: 2.5.1
+
+  packages/domain-models:
+    specifiers:
+      '@setup-cljstyle/config': '*'
+      '@typescript-eslint/eslint-plugin': '*'
+      '@typescript-eslint/parser': '*'
+      eslint: '*'
+      eslint-config-prettier: '*'
+      prettier: '*'
+      typescript: '*'
+    devDependencies:
+      '@setup-cljstyle/config': link:../config
+      '@typescript-eslint/eslint-plugin': 5.7.0_a6f6159640504abdd3de077f8bcadb33
+      '@typescript-eslint/parser': 5.7.0_eslint@8.5.0+typescript@4.5.4
+      eslint: 8.5.0
+      eslint-config-prettier: 8.3.0_eslint@8.5.0
+      prettier: 2.5.1
+      typescript: 4.5.4
 
 packages:
 

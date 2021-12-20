@@ -1,28 +1,23 @@
 {
-  "name": "@setup-cljstyle/github-action",
+  "name": "@setup-cljstyle/domain-models",
   "version": "0.1.0",
   "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc && ts-eager ./scripts/build.ts",
-    "dev": "tsc -w & ts-eager ./scripts/dev.ts",
+    "build": "tsc",
+    "dev": "tsc -w",
     "lint": "eslint --ext .js,.ts .",
     "format:check": "prettier --check \"**/*.{ts,js}\"",
     "format:write": "prettier --write \"**/*.{ts,js}\""
   },
-  "dependencies": {
-    "@setup-cljstyle/commit-comment": "*",
-    "@setup-cljstyle/domain-models": "*"
-  },
   "devDependencies": {
     "@setup-cljstyle/config": "*",
-    "@types/node": "^17.0.0",
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
-    "esbuild": "^0.14.5",
     "eslint": "*",
     "eslint-config-prettier": "*",
     "prettier": "*",
-    "ts-eager": "^2.0.2",
     "typescript": "*"
   }
 }

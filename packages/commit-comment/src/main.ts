@@ -1,9 +1,9 @@
-import * as core from "@actions/core";
-import * as github from "@actions/github";
-import parse from "parse-diff";
+import * as core from '@actions/core';
+import * as github from '@actions/github';
+import parse from 'parse-diff';
 
 export const createCommitComment = async () => {
-    const myToken = core.getInput("token");
+    const myToken = core.getInput('token');
     const octokit = github.getOctokit(myToken);
 
     const input = `--- a/example/main.clj
@@ -19,12 +19,12 @@ export const createCommitComment = async () => {
         const text = chunks.reduce((accChunk, { changes }) => {
             const codeBlock = changes.reduce(
                 (acc, { content }) => `${acc}${content}\n`,
-                ""
+                ''
             );
             return `${accChunk}\`\`\`diff\n${codeBlock}\`\`\``;
-        }, "");
+        }, '');
         return `${accRes}## ${h2}\n\n${text}\n\n`;
-    }, "");
+    }, '');
 
     try {
         const {
@@ -35,7 +35,7 @@ export const createCommitComment = async () => {
             commit_sha: github.context.sha,
             body: `# Cljstyle Report\n\n${body}`,
         });
-        console.log("Commit comment created:", htmlUrl);
+        console.log('Commit comment created:', htmlUrl);
     } catch (e) {
         console.error(e);
     }

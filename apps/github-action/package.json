@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "build": "ts-eager ./scripts/build.ts",
-    "dev": "ts-eager ./scripts/dev.ts"
+    "dev": "ts-eager ./scripts/dev.ts",
+    "lint": "eslint --ext .js .",
+    "format:check": "prettier --check \"**/*.{ts,js}\"",
+    "format:write": "prettier --write \"**/*.{ts,js}\""
   },
   "dependencies": {
     "@setup-cljstyle/commit-comment": "*"
@@ -13,6 +16,9 @@
     "@setup-cljstyle/config": "*",
     "@types/node": "^17.0.0",
     "esbuild": "^0.14.5",
-    "ts-eager": "^2.0.2"
+    "eslint": "*",
+    "prettier": "*",
+    "ts-eager": "^2.0.2",
+    "typescript": "*"
   }
 }

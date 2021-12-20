@@ -1,6 +1,6 @@
-import { build } from "esbuild";
+import { build } from 'esbuild';
 
-import { baseBuildOptions } from "./base";
+import { baseBuildOptions } from './base';
 
 build(baseBuildOptions)
     .then((res) => {

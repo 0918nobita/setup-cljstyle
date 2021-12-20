@@ -3,7 +3,10 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --parallel"
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint --parallel",
+    "format:check": "turbo run format:check --parallel",
+    "format:write": "turbo run format:write --parallel"
   },
   "turbo": {
     "baseBranch": "origin/main",
@@ -14,6 +17,15 @@
         ]
       },
       "dev": {
+        "cache": false
+      },
+      "lint": {
+        "cache": false
+      },
+      "format:check": {
+        "cache": false
+      },
+      "format:write": {
         "cache": false
       }
     }

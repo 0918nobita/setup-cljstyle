@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w"
+    "lint": "eslint --ext .js .",
+    "format:check": "prettier --check \"**/*.js\"",
+    "format:write": "prettier --write \"**/*.js\""
   },
-  "exports": {
-    "./eslint-config": "./dist/eslint.js",
-    "./prettier-config": "./dist/prettier.js",
-    "./tsconfig": "./tsconfig.base.json"
+  "devDependencies": {
+    "eslint": "*",
+    "prettier": "*"
   }
 }

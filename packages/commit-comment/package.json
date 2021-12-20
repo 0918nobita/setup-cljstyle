@@ -2,12 +2,14 @@
   "name": "@setup-cljstyle/commit-comment",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "types": "dist/main.d.ts",
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "lint": "eslint --ext .js .",
+    "format:check": "prettier --check \"**/*.{ts,js}\"",
+    "format:write": "prettier --write \"**/*.{ts,js}\""
   },
   "dependencies": {
     "@actions/core": "^1.6.0",
@@ -15,6 +17,9 @@
     "parse-diff": "^0.9.0"
   },
   "devDependencies": {
-    "@setup-cljstyle/config": "*"
+    "@setup-cljstyle/config": "*",
+    "eslint": "*",
+    "prettier": "*",
+    "typescript": "*"
   }
 }

@@ -20,30 +20,47 @@ importers:
       '@setup-cljstyle/config': '*'
       '@types/node': ^17.0.0
       esbuild: ^0.14.5
+      eslint: '*'
+      prettier: '*'
       ts-eager: ^2.0.2
+      typescript: '*'
     dependencies:
       '@setup-cljstyle/commit-comment': link:../../packages/commit-comment
     devDependencies:
       '@setup-cljstyle/config': link:../../packages/config
       '@types/node': 17.0.0
       esbuild: 0.14.5
+      eslint: 8.5.0
+      prettier: 2.5.1
       ts-eager: 2.0.2
+      typescript: 4.5.4
 
   packages/commit-comment:
     specifiers:
       '@actions/core': ^1.6.0
       '@actions/github': ^5.0.0
       '@setup-cljstyle/config': '*'
+      eslint: '*'
       parse-diff: ^0.9.0
+      prettier: '*'
+      typescript: '*'
     dependencies:
       '@actions/core': 1.6.0
       '@actions/github': 5.0.0
       parse-diff: 0.9.0
     devDependencies:
       '@setup-cljstyle/config': link:../config
+      eslint: 8.5.0
+      prettier: 2.5.1
+      typescript: 4.5.4
 
   packages/config:
-    specifiers: {}
+    specifiers:
+      eslint: '*'
+      prettier: '*'
+    devDependencies:
+      eslint: 8.5.0
+      prettier: 2.5.1
 
 packages:
 

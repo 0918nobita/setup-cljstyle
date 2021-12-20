@@ -22,3 +22,21 @@ watch mode:
 ```bash
 pnpm dev
 ```
+
+## Lint
+
+```bash
+pnpm lint
+```
+
+## Format
+
+```bash
+pnpm format:check
+```
+
+or
+
+```bash
+pnpm format:write
+```

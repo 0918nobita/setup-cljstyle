@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "lint": "eslint --ext .js .",
+    "lint": "eslint --ext .js,.ts .",
     "format:check": "prettier --check \"**/*.{ts,js}\"",
     "format:write": "prettier --write \"**/*.{ts,js}\""
   },
@@ -18,7 +18,10 @@
   },
   "devDependencies": {
     "@setup-cljstyle/config": "*",
+    "@typescript-eslint/eslint-plugin": "*",
+    "@typescript-eslint/parser": "*",
     "eslint": "*",
+    "eslint-config-prettier": "*",
     "prettier": "*",
     "typescript": "*"
   }

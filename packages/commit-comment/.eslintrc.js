@@ -1,3 +1,6 @@
+const eslint = require('@setup-cljstyle/config/eslint');
+
 module.exports = {
-    ...require('@setup-cljstyle/config/eslint'),
+    ...eslint.baseConfig,
+    overrides: [eslint.setupTypeScript({ tsconfigRootDir: __dirname })],
 };

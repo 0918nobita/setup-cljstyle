@@ -15,7 +15,10 @@ export const createCommitComment = async () => {
 `;
 
     const body = parse(input).reduce((accRes, { chunks, from, to }) => {
+        if (!from || !to) return accRes;
+
         const h2 = from === to ? `\`${from}\`` : `\`${from}\` → \`${to}\``;
+
         const text = chunks.reduce((accChunk, { changes }) => {
             const codeBlock = changes.reduce(
                 (acc, { content }) => `${acc}${content}\n`,
@@ -23,6 +26,7 @@ export const createCommitComment = async () => {
             );
             return `${accChunk}\`\`\`diff\n${codeBlock}\`\`\``;
         }, '');
+
         return `${accRes}## ${h2}\n\n${text}\n\n`;
     }, '');
 
@@ -35,6 +39,7 @@ export const createCommitComment = async () => {
             commit_sha: github.context.sha,
             body: `# Cljstyle Report\n\n${body}`,
         });
+
         console.log('Commit comment created:', htmlUrl);
     } catch (e) {
         console.error(e);

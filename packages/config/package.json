@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "eslint": "*",
+    "eslint-config-prettier": "*",
     "prettier": "*"
   }
 }

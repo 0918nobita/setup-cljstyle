@@ -5,7 +5,7 @@
   "scripts": {
     "build": "ts-eager ./scripts/build.ts",
     "dev": "ts-eager ./scripts/dev.ts",
-    "lint": "eslint --ext .js .",
+    "lint": "eslint --ext .js,.ts .",
     "format:check": "prettier --check \"**/*.{ts,js}\"",
     "format:write": "prettier --write \"**/*.{ts,js}\""
   },
@@ -15,8 +15,11 @@
   "devDependencies": {
     "@setup-cljstyle/config": "*",
     "@types/node": "^17.0.0",
+    "@typescript-eslint/eslint-plugin": "*",
+    "@typescript-eslint/parser": "*",
     "esbuild": "^0.14.5",
     "eslint": "*",
+    "eslint-config-prettier": "*",
     "prettier": "*",
     "ts-eager": "^2.0.2",
     "typescript": "*"

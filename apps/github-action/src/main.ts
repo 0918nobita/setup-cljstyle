@@ -1,6 +1,10 @@
 import * as core from '@actions/core';
 import { createCommitComment } from '@setup-cljstyle/commit-comment';
-import { gha, version } from '@setup-cljstyle/domain-models';
+import {
+    GitHubActions,
+    wrapInputValue,
+    wrapVersion,
+} from '@setup-cljstyle/domain-models';
 import parse from 'parse-diff';
 import { platform } from 'process';
 
@@ -31,16 +35,16 @@ const body = parse(input).reduce((accRes, { chunks, from, to }) => {
 }, '# Cljstyle Report\n\n');
 
 void (async () => {
-    const githubActions: gha.GitHubActions = {
+    const githubActions: GitHubActions = {
         /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function */
         addPath: (_) => {},
         cacheDir: (_) => {},
         /* eslint-enable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function */
-        getInput: (name) => gha.inputValue.iso.wrap(core.getInput(name)),
+        getInput: (name) => wrapInputValue(core.getInput(name)),
     };
 
     await getInstaller(platform)({
-        version: version.iso.wrap('0.15.0'),
+        version: wrapVersion('0.15.0'),
     });
 
     await createCommitComment({ githubActions, body });

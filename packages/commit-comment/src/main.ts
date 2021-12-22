@@ -1,12 +1,12 @@
 import * as github from '@actions/github';
-import { gha } from '@setup-cljstyle/domain-models';
+import { GitHubActions, wrapInputName } from '@setup-cljstyle/domain-models';
 
 type Args = {
-    githubActions: gha.GitHubActions;
+    githubActions: GitHubActions;
     body: string;
 };
 export const createCommitComment = async ({ githubActions, body }: Args) => {
-    const token = githubActions.getInput(gha.inputName.iso.wrap('token'));
+    const token = githubActions.getInput(wrapInputName('token'));
     const octokit = github.getOctokit(token);
 
     try {

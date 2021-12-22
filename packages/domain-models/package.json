@@ -2,22 +2,23 @@
   "name": "@setup-cljstyle/domain-models",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc -w",
+    "build": "ts-eager ./scripts/codegen.ts && tsc",
     "lint": "eslint --ext .js,.ts .",
     "format:check": "prettier --check \"**/*.{ts,js}\"",
     "format:write": "prettier --write \"**/*.{ts,js}\""
   },
   "devDependencies": {
+    "@setup-cljstyle/codegen": "*",
     "@setup-cljstyle/config": "*",
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
     "eslint": "*",
     "eslint-config-prettier": "*",
     "prettier": "*",
+    "ts-eager": "*",
     "typescript": "*"
   }
 }

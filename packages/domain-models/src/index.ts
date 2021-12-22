@@ -1,8 +1,8 @@
-export * from './models';
+export * from '../generated';
 
-import { dirPath, version } from './models';
+import type { DirPath, InputName, InputValue, Version } from '../generated';
 
-export type Installer = (arg: { version: version.T }) => Promise<dirPath.T>;
+export type Installer = (arg: { version: Version }) => Promise<DirPath>;
 
 export type RawInputs = {
     cljstyleVersion: string;
@@ -11,3 +11,9 @@ export type RawInputs = {
 };
 
 export type RawInputSource = () => Promise<RawInputs>;
+
+export type GitHubActions = {
+    addPath: (p: DirPath) => void;
+    cacheDir: (p: DirPath) => void;
+    getInput: (name: InputName) => InputValue;
+};

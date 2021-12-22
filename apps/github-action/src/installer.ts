@@ -1,29 +1,30 @@
 import {
     Installer,
-    version,
-    dirPath,
-    url,
+    Url,
+    Version,
+    wrapDirPath,
+    wrapUrl,
 } from '@setup-cljstyle/domain-models';
 
 const installerForWin32: Installer = () => {
-    return Promise.resolve(dirPath.iso.wrap(''));
+    return Promise.resolve(wrapDirPath(''));
 };
 
 const installerForDarwin: Installer = () => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    const binDir = dirPath.iso.wrap('/home/runner/.local/bin');
+    const binDir = wrapDirPath('/home/runner/.local/bin');
 
-    const downloadUrl = (version: version.T): url.T =>
+    const downloadUrl = (version: Version): Url =>
         /* eslint-enable @typescript-eslint/no-unused-vars */
-        url.iso.wrap(
+        wrapUrl(
             `http://github.com/greglook/cljstyle/releases/download/${version}/cljstyle_${version}_linux.tar.gz`
         );
 
-    return Promise.resolve(dirPath.iso.wrap(''));
+    return Promise.resolve(wrapDirPath(''));
 };
 
 const installerForLinux: Installer = () => {
-    return Promise.resolve(dirPath.iso.wrap(''));
+    return Promise.resolve(wrapDirPath(''));
 };
 
 export const getInstaller = (p: NodeJS.Platform): Installer => {

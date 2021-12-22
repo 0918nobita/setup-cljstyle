@@ -24,7 +24,7 @@
     "eslint": "*",
     "eslint-config-prettier": "*",
     "prettier": "*",
-    "ts-eager": "^2.0.2",
+    "ts-eager": "*",
     "typescript": "*"
   }
 }

@@ -1,5 +1,5 @@
-import type { Branded } from '../utils/branded';
-import { createIso } from '../utils/iso';
+import { Branded } from '../../utils/branded';
+import { createIso } from '../../utils/iso';
 
 declare const sym: unique symbol;
 

@@ -1,8 +1,8 @@
 import type { Branded } from '../utils/branded';
-import { iso } from '../utils/iso';
+import { createIso } from '../utils/iso';
 
-declare const url: unique symbol;
+declare const sym: unique symbol;
 
-export type Url = Branded<string, typeof url>;
+export type T = Branded<string, typeof sym>;
 
-export const urlIso = iso<typeof url>();
+export const iso = createIso<typeof sym>();

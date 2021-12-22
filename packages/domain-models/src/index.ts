@@ -1,12 +1,8 @@
-export * from './models/dirPath';
-export * from './models/filePath';
-export * from './models/url';
-export * from './models/version';
+export * from './models';
 
-import type { DirPath } from './models/dirPath';
-import type { Version } from './models/version';
+import { dirPath, version } from './models';
 
-export type Installer = (arg: { version: Version }) => Promise<DirPath>;
+export type Installer = (arg: { version: version.T }) => Promise<dirPath.T>;
 
 export type RawInputs = {
     cljstyleVersion: string;

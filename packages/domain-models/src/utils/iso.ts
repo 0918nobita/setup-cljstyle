@@ -5,7 +5,7 @@ type Iso<T> = {
     unwrap: <V>(b: Branded<V, T>) => V;
 };
 
-export const iso = <T>(): Iso<T> => ({
+export const createIso = <T>(): Iso<T> => ({
     wrap: <V>(v: V) => v as Branded<V, T>,
     unwrap: <V>(b: Branded<V, T>) => b,
 });

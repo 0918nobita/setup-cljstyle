@@ -1,8 +1,8 @@
 import type { Branded } from '../utils/branded';
-import { iso } from '../utils/iso';
+import { createIso } from '../utils/iso';
 
-declare const filePath: unique symbol;
+declare const sym: unique symbol;
 
-export type FilePath = Branded<string, typeof filePath>;
+export type T = Branded<string, typeof sym>;
 
-export const filePathIso = iso<typeof filePath>();
+export const iso = createIso<typeof sym>();

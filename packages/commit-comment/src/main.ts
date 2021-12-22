@@ -1,46 +1,25 @@
-import * as core from '@actions/core';
 import * as github from '@actions/github';
-import parse from 'parse-diff';
+import { gha } from '@setup-cljstyle/domain-models';
 
-export const createCommitComment = async () => {
-    const myToken = core.getInput('token');
-    const octokit = github.getOctokit(myToken);
-
-    const input = `--- a/example/main.clj
-+++ b/example/main.clj
-@@ -1,2 +1,2 @@
- (println "Hello, world!")
--  (println "Clojure")
-+(println "Clojure")
-`;
-
-    const body = parse(input).reduce((accRes, { chunks, from, to }) => {
-        if (!from || !to) return accRes;
-
-        const h2 = from === to ? `\`${from}\`` : `\`${from}\` → \`${to}\``;
-
-        const text = chunks.reduce((accChunk, { changes }) => {
-            const codeBlock = changes.reduce(
-                (acc, { content }) => `${acc}${content}\n`,
-                ''
-            );
-            return `${accChunk}\`\`\`diff\n${codeBlock}\`\`\``;
-        }, '');
-
-        return `${accRes}## ${h2}\n\n${text}\n\n`;
-    }, '');
+type Args = {
+    githubActions: gha.GitHubActions;
+    body: string;
+};
+export const createCommitComment = async ({ githubActions, body }: Args) => {
+    const token = githubActions.getInput(gha.inputName.iso.wrap('token'));
+    const octokit = github.getOctokit(token);
 
     try {
-        const {
-            data: { html_url: htmlUrl },
-        } = await octokit.rest.repos.createCommitComment({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            commit_sha: github.context.sha,
-            body: `# Cljstyle Report\n\n${body}`,
+        const { owner, repo } = github.context.repo;
+        const commit_sha = github.context.sha;
+        const { data } = await octokit.rest.repos.createCommitComment({
+            owner,
+            repo,
+            commit_sha,
+            body,
         });
 
-        console.log('Commit comment created:', htmlUrl);
+        console.log('Commit comment created:', data.html_url);
     } catch (e) {
         console.error(e);
     }

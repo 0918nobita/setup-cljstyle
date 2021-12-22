@@ -10,8 +10,10 @@
     "format:write": "prettier --write \"**/*.{ts,js}\""
   },
   "dependencies": {
+    "@actions/core": "^1.6.0",
     "@setup-cljstyle/commit-comment": "*",
-    "@setup-cljstyle/domain-models": "*"
+    "@setup-cljstyle/domain-models": "*",
+    "parse-diff": "^0.9.0"
   },
   "devDependencies": {
     "@setup-cljstyle/config": "*",

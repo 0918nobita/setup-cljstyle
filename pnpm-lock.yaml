@@ -22,6 +22,7 @@ importers:
 
   apps/github-action:
     specifiers:
+      '@actions/core': ^1.6.0
       '@setup-cljstyle/commit-comment': '*'
       '@setup-cljstyle/config': '*'
       '@setup-cljstyle/domain-models': '*'
@@ -31,12 +32,15 @@ importers:
       esbuild: ^0.14.5
       eslint: '*'
       eslint-config-prettier: '*'
+      parse-diff: ^0.9.0
       prettier: '*'
       ts-eager: ^2.0.2
       typescript: '*'
     dependencies:
+      '@actions/core': 1.6.0
       '@setup-cljstyle/commit-comment': link:../../packages/commit-comment
       '@setup-cljstyle/domain-models': link:../../packages/domain-models
+      parse-diff: 0.9.0
     devDependencies:
       '@setup-cljstyle/config': link:../../packages/config
       '@types/node': 17.0.0
@@ -51,20 +55,18 @@ importers:
 
   packages/commit-comment:
     specifiers:
-      '@actions/core': ^1.6.0
       '@actions/github': ^5.0.0
       '@setup-cljstyle/config': '*'
+      '@setup-cljstyle/domain-models': '*'
       '@typescript-eslint/eslint-plugin': '*'
       '@typescript-eslint/parser': '*'
       eslint: '*'
       eslint-config-prettier: '*'
-      parse-diff: ^0.9.0
       prettier: '*'
       typescript: '*'
     dependencies:
-      '@actions/core': 1.6.0
       '@actions/github': 5.0.0
-      parse-diff: 0.9.0
+      '@setup-cljstyle/domain-models': link:../domain-models
     devDependencies:
       '@setup-cljstyle/config': link:../config
       '@typescript-eslint/eslint-plugin': 5.7.0_a6f6159640504abdd3de077f8bcadb33

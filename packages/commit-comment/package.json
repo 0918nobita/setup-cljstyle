@@ -12,9 +12,8 @@
     "format:write": "prettier --write \"**/*.{ts,js}\""
   },
   "dependencies": {
-    "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.0",
-    "parse-diff": "^0.9.0"
+    "@setup-cljstyle/domain-models": "*"
   },
   "devDependencies": {
     "@setup-cljstyle/config": "*",

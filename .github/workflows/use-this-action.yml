@@ -6,60 +6,12 @@ on:
       - 'release/**'
 
 jobs:
-  use-on-windows:
-    runs-on: windows-latest
-    name: Use this action on Windows
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./
-        with:
-          cljstyle-version: "0.15.0"
-      - run: "ls \"D:\\cljstyle\""
-      - run: cljstyle version
-
-  use-on-macOS:
-    runs-on: macos-latest
-    name: Use this action on macOS
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./
-        with:
-          cljstyle-version: "0.14.0"
-      - run: cljstyle version
-
-  use-on-linux-1:
+  use-on-linux:
     runs-on: ubuntu-latest
-    name: Use this action on Linux
+    name: Linux
     steps:
       - uses: actions/checkout@v2
       - uses: ./
         with:
           run-check: true
-      - run: cljstyle version
-
-  use-on-linux-2:
-    runs-on: ubuntu-latest
-    name: Enable reviewdog
-    steps:
-      - uses: actions/checkout@v2
-      - uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
-      - uses: ./
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.PAT }}
-        with:
-          run-check: |
-            reviewdog-enabled: true
-      - run: cljstyle version
-
-  use-on-linux-3:
-    runs-on: ubuntu-latest
-    name: Disable reviewdog
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./
-        with:
-          run-check: |
-            reviewdog-enabled: false
-      - run: cljstyle version
+      # - run: cljstyle version

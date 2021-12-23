@@ -15,4 +15,4 @@ inputs:
     default: 'false'
 runs:
   using: node12
-  main: setup-cljstyle.js
+  main: dist/bundle.js

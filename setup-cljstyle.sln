@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "App", "src\App.fsproj", "{AC2ACABE-67FB-49B0-B1DE-352CDE956A25}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "App", "src\app\App.fsproj", "{AC2ACABE-67FB-49B0-B1DE-352CDE956A25}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{01EB8C3E-17CE-425A-920C-E1BAA2C2CD0B}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GitHubActions", "src\githubActions\GitHubActions.fsproj", "{E72FA746-5009-4549-BA1A-B7AD8CE82B0E}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GitHubRest", "src\githubRest\GitHubRest.fsproj", "{618E4B4C-FB28-4CAD-BA1B-25EFA92407FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +24,17 @@ Global
 		{AC2ACABE-67FB-49B0-B1DE-352CDE956A25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC2ACABE-67FB-49B0-B1DE-352CDE956A25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC2ACABE-67FB-49B0-B1DE-352CDE956A25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E72FA746-5009-4549-BA1A-B7AD8CE82B0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E72FA746-5009-4549-BA1A-B7AD8CE82B0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E72FA746-5009-4549-BA1A-B7AD8CE82B0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E72FA746-5009-4549-BA1A-B7AD8CE82B0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{618E4B4C-FB28-4CAD-BA1B-25EFA92407FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{618E4B4C-FB28-4CAD-BA1B-25EFA92407FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{618E4B4C-FB28-4CAD-BA1B-25EFA92407FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{618E4B4C-FB28-4CAD-BA1B-25EFA92407FC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E72FA746-5009-4549-BA1A-B7AD8CE82B0E} = {01EB8C3E-17CE-425A-920C-E1BAA2C2CD0B}
+		{618E4B4C-FB28-4CAD-BA1B-25EFA92407FC} = {01EB8C3E-17CE-425A-920C-E1BAA2C2CD0B}
 	EndGlobalSection
 EndGlobal

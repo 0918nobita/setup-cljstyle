@@ -3,10 +3,11 @@
   "private": true,
   "scripts": {
     "postinstall": "dotnet tool restore",
-    "build": "dotnet fable ./src/App.fsproj -o ./dist",
+    "build": "dotnet fable ./src/app/App.fsproj -o ./dist",
     "bundle": "esbuild --platform=node --target=node12 --bundle --minify --outfile=dist/bundle.js dist/App.js"
   },
   "dependencies": {
+    "@actions/github": "^5.0.0",
     "@actions/io": "^1.1.1",
     "@actions/tool-cache": "^1.7.1",
     "js-yaml": "^4.1.0"

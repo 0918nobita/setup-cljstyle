@@ -9,11 +9,11 @@ getInput GitHubActionsImpl.instance "cljstyle-version"
 let authToken = getInput GitHubActionsImpl.instance "token"
 
 promise {
-    let! version = fetchLatestRelease GitHubRestTest.instance {
+    let! version = fetchLatestRelease GitHubRestImpl.instance {
         authToken = authToken
         owner = "greglook"
         repo = "cljstyle"
     }
-    printfn "fetchLatestRelease => %A" version
+    printfn "Fetched latest release: %A" version
 }
 |> ignore

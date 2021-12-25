@@ -3,7 +3,7 @@
 module GitHubActions.Impl
 
 open Fable.Core
-open Type
+open Types
 
 [<Import("addPath", "@actions/core")>]
 let addPathNative: string -> unit = jsNative

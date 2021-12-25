@@ -2,7 +2,7 @@
 
 module GitHubActions.Test
 
-open Type
+open Types
 
 type GitHubActionsTest private () =
     static member instance = GitHubActionsTest()
@@ -10,5 +10,3 @@ type GitHubActionsTest private () =
     static member inline addPath(_path: Path) = ()
 
     static member inline getInput(_name: string) = "value"
-
-    static member inline group(f: ^a -> ^b) = f

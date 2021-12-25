@@ -16,3 +16,14 @@ jobs:
       - run: dotnet tool restore
       - run: dotnet restore
       - run: dotnet fsharplint lint setup-cljstyle.sln
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+      - run: dotnet tool restore
+      - run: dotnet restore
+      - run: dotnet fantomas --check --recurse src

@@ -5,14 +5,11 @@ module GitHubRest.Octokit
 open Fable.Core
 
 [<Struct>]
-type GetLatestReleaseArgs = {
-    owner: string
-    repo: string
-}
+type GetLatestReleaseArgs = { owner: string; repo: string }
 
 type IRelease =
     [<Emit("$0.tag_name")>]
-    abstract member tagName: string
+    abstract tagName: string
 
 type IGetLatestReleaseResult =
     abstract member data: IRelease

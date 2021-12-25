@@ -1,6 +1,23 @@
 module GitHubActions
 
-type Path = Path of string
+open Fable.Core
+
+type Path =
+    private
+    | Path of string
+
+[<Import("addPath", "@actions/core")>]
+let private addPathNative: string -> unit = jsNative
+
+[<Import("getInput", "@actions/core")>]
+let private getInputNative: string -> string = jsNative
+
+type GitHubActionsImpl private () =
+    static member instance = GitHubActionsImpl()
+
+    static member inline addPath(Path(path)) = addPathNative path
+
+    static member inline getInput(name) = getInputNative name
 
 type GitHubActionsTest private () =
     static member instance = GitHubActionsTest()

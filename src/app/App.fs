@@ -3,14 +3,16 @@
 open GitHubActions
 open GitHubRest
 
-getInput GitHubActionsTest.instance "name"
-|> printfn "getInput => %A"
+getInput GitHubActionsImpl.instance "cljstyle-version"
+|> printfn "Specified cljstyle version: %s"
+
+let authToken = getInput GitHubActionsImpl.instance "token"
 
 promise {
     let! version = fetchLatestRelease GitHubRestTest.instance {
-        authToken = "token"
-        owner = "owner"
-        repo = "repo"
+        authToken = authToken
+        owner = "greglook"
+        repo = "cljstyle"
     }
     printfn "fetchLatestRelease => %A" version
 }

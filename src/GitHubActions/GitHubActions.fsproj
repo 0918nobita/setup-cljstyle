@@ -4,6 +4,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Type.fs" />
+    <Compile Include="GHAImpl.fs" />
+    <Compile Include="GHATest.fs" />
     <Compile Include="Library.fs" />
   </ItemGroup>
 

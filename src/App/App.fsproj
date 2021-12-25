@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\githubActions\GitHubActions.fsproj" />
-    <ProjectReference Include="..\githubRest\GitHubRest.fsproj" />
+    <ProjectReference Include="..\GitHubActions\GitHubActions.fsproj" />
+    <ProjectReference Include="..\GitHubRest\GitHubRest.fsproj" />
   </ItemGroup>
 </Project>

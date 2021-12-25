@@ -1,7 +1,9 @@
 ﻿module App
 
-open GitHubActions
-open GitHubRest
+open GitHubActions.Impl
+open GitHubActions.Invoke
+open GitHubRest.Impl
+open GitHubRest.Invoke
 
 getInput GitHubActionsImpl.instance "cljstyle-version"
 |> printfn "Specified cljstyle version: %s"

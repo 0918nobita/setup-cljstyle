@@ -4,6 +4,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="Octokit.fs" />
+    <Compile Include="GHRImpl.fs" />
+    <Compile Include="GHRTest.fs" />
     <Compile Include="Library.fs" />
   </ItemGroup>
 

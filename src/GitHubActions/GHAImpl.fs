@@ -1,3 +1,5 @@
+// fsharplint:disable memberNames
+
 module GitHubActions.Impl
 
 open Fable.Core

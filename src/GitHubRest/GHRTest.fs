@@ -1,3 +1,5 @@
+// fsharplint:disable memberNames
+
 module GitHubRest.Test
 
 open Types

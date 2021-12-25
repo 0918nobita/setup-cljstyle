@@ -1,3 +1,5 @@
+// fsharplint:disable recordFieldNames
+
 module GitHubRest.Types
 
 [<Struct>]

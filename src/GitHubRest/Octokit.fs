@@ -1,3 +1,5 @@
+// fsharplint:disable recordFieldNames memberNames
+
 module GitHubRest.Octokit
 
 open Fable.Core

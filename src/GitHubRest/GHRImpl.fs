@@ -1,3 +1,5 @@
+// fsharplint:disable memberNames
+
 module GitHubRest.Impl
 
 open Octokit

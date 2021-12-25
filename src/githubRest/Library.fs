@@ -23,23 +23,19 @@ type FetchLatestReleaseArgs = {
     repo: string
 }
 
-type IGitHubRest =
-    abstract member FetchLatestRelease : FetchLatestReleaseArgs -> JS.Promise<Version>
-
-[<Sealed>]
 type GitHubRestImpl private () =
-    static member Instance: IGitHubRest = GitHubRestImpl()
+    static member instance = GitHubRestImpl()
 
-    interface IGitHubRest with
-        member _.FetchLatestRelease(_args: FetchLatestReleaseArgs) =
-            Promise.lift (Version "0.15.0")
+    static member inline fetchLatestRelease(_args: FetchLatestReleaseArgs) =
+        Promise.lift (Version "0.15.0")
 
-[<Sealed>]
 type GitHubRestTest private () =
-    static member Instance: IGitHubRest = GitHubRestTest()
+    static member instance = GitHubRestTest()
 
-    interface IGitHubRest with
-        member _.FetchLatestRelease(args: FetchLatestReleaseArgs) =
-            let octokit = getOctokit args.authToken
-            JS.console.dir octokit.rest
-            Promise.lift (Version "0.15.0")
+    static member inline fetchLatestRelease(args: FetchLatestReleaseArgs) =
+        let octokit = getOctokit args.authToken
+        JS.console.dir octokit.rest
+        Promise.lift (Version "0.15.0")
+
+let inline fetchLatestRelease (_ghr: ^g) (args: FetchLatestReleaseArgs) =
+    (^g: (static member fetchLatestRelease: FetchLatestReleaseArgs -> JS.Promise<Version>) args)

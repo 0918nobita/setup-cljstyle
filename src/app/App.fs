@@ -3,11 +3,11 @@
 open GitHubActions
 open GitHubRest
 
-GitHubActionsTest.Instance.GetInput "name"
+getInput GitHubActionsTest.instance "name"
 |> printfn "getInput => %A"
 
 promise {
-    let! version = GitHubRestTest.Instance.FetchLatestRelease {
+    let! version = fetchLatestRelease GitHubRestTest.instance {
         authToken = "token"
         owner = "owner"
         repo = "repo"

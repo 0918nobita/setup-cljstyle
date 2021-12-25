@@ -2,16 +2,20 @@ module GitHubActions
 
 type Path = Path of string
 
-type IGitHubActions =
-    abstract member AddPath : Path -> unit
-    abstract member GetInput : string -> string
-    abstract member Group : ('a -> 'b) -> ('a -> 'b)
-
-[<Sealed>]
 type GitHubActionsTest private () =
-    static member Instance: IGitHubActions = GitHubActionsTest()
+    static member instance = GitHubActionsTest()
 
-    interface IGitHubActions with
-        member _.AddPath(_path: Path) = ()
-        member _.GetInput(_name: string) = "value"
-        member _.Group(f: 'a -> 'b) = f
+    static member inline addPath(_path: Path) = ()
+
+    static member inline getInput(_name: string) = "value"
+
+    static member inline group(f: ^a -> ^b) = f
+
+let inline addPath (_gha: ^g) (path: Path) =
+    (^g: (static member addPath: Path -> unit) path)
+
+let inline getInput (_gha: ^g) (name: string) =
+    (^g: (static member getInput: string -> string) name)
+
+let inline group (_gha: ^g) (f: ^a -> ^b) =
+    (^g: (static member group: (^a -> ^b) -> (^a -> ^b)) f)

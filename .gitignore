@@ -1,7 +1,9 @@
 .ionide
+.paket
 bin
 dist
 node_modules
 obj
+paket-files
 
 .pnpm-debug.log

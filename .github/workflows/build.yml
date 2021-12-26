@@ -23,6 +23,9 @@ jobs:
         with:
           version: "6.24.2"
           run_install: true
+      - run: dotnet tool restore
+      - run: dotnet paket restore
+      - run: dotnet restore
       - name: Build
         run: pnpm build && pnpm bundle
       - name: Commit and push setup-cljstyle.js

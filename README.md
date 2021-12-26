@@ -52,20 +52,6 @@ steps:
 
 **Optional** Default is ``${{ github.token }}``.
 
-#### `run-check`
-
-**Optional** (_default:_ `false`) If specified, run `cljstyle check --verbose` after installing cljstyle.
-
-Example :
-
-```yaml
-steps:
-  - uses: actions/checkout@v2
-  - uses: 0918nobita/setup-cljstyle@v0.5.4
-    with:
-      run-check: true
-```
-
 ## Supported runners
 
 - `windows-latest`

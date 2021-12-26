@@ -2,35 +2,38 @@
 
 ## Requirements
 
+- [.NET 6.0 SDK](https://dotnet.microsoft.com/en-us/)
+- [Node.js](https://nodejs.org/en/)
 - [pnpm](https://pnpm.io)
-- [zephyr](https://github.com/coot/zephyr)
+
+## Install dotnet tools
+
+```bash
+dotnet tool restore
+```
 
 ## Install dependencies
 
 ```bash
+dotnet paket restore
+dotnet restore
 pnpm install
 ```
 
 ## Build
 
 ```bash
-pnpm build
+pnpm build && pnpm bundle
 ```
 
 ## Lint
 
 ```bash
-pnpm lint
+dotnet fsharplint lint setup-cljstyle.sln
 ```
 
 ## Format code
 
 ```bash
-pnpm format
-```
-
-## Run tests
-
-```bash
-pnpm test
+dotnet fantomas --recurse src
 ```

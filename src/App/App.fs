@@ -33,5 +33,8 @@ let asyncMain () =
 
         printfn "Fetched latest release: %A" version
     }
+    |> Promise.catch (fun err ->
+        eprintfn "Failed to fetch latest release"
+        eprintfn "%A" err)
 
 group "Debug" asyncMain () |> ignore

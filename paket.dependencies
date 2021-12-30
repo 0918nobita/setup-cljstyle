@@ -6,4 +6,7 @@ framework: net6.0
 nuget Fable.Core
 nuget Fable.Promise
 nuget Thoth.Json
+
 nuget Expecto
+nuget Microsoft.NET.Test.Sdk
+nuget YoloDev.Expecto.TestSdk

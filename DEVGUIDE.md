@@ -37,3 +37,9 @@ dotnet fsharplint lint setup-cljstyle.sln
 ```bash
 dotnet fantomas --recurse src
 ```
+
+## Test
+
+```bash
+dotnet test
+```

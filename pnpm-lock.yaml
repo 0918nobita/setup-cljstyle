@@ -23,8 +23,8 @@ devDependencies:
     specifier: ^0.15.14
     version: 0.15.14
   purs-tidy:
-    specifier: ^0.6.2
-    version: 0.6.2
+    specifier: ^0.10.1
+    version: 0.10.1
   spago:
     specifier: ^0.21.0
     version: 0.21.0
@@ -1304,8 +1304,8 @@ packages:
       - supports-color
     dev: true
 
-  /purs-tidy@0.6.2:
-    resolution: {integrity: sha512-vakkmCDlb9G8A7m6azxjbUfuwz6Lomn93RRWcqNrQbNIHDwBs05pfLZb5XslqcNbP5UIJ4wfL+YhL1/GlfNoBw==}
+  /purs-tidy@0.10.1:
+    resolution: {integrity: sha512-i1QvMaDEaZXv/GWZNFWs5CISiBOkwPhG4D1S4Rw6zUCGaE+NQNWTjvwY21rifynGa2N2TiBJRC61LkORbmGxrA==}
     hasBin: true
     dev: true
 

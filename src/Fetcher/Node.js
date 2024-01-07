@@ -1,25 +1,26 @@
-const https = require('https');
+import https from "node:https";
 
-exports._fetchTextImpl =
-  ({ url, authorization }) => (onError, onSuccess) => {
+export const _fetchTextImpl =
+  ({ url, authorization }) =>
+  (onError, onSuccess) => {
     https.get(
       url,
       {
         headers: {
           Authorization: authorization,
-          'User-Agent': 'Node.js',
+          "User-Agent": "Node.js",
         },
       },
       (res) => {
-        res.on('error', (err) => onError(err));
+        res.on("error", (err) => onError(err));
 
-        let data = '';
+        let data = "";
 
-        res.on('data', (chunk) => {
+        res.on("data", (chunk) => {
           data += chunk;
         });
 
-        res.on('end', () => onSuccess(data));
+        res.on("end", () => onSuccess(data));
       }
     );
   };

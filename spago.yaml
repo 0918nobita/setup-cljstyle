@@ -1,0 +1,69 @@
+package:
+  dependencies:
+    - aff
+    - argonaut
+    - argonaut-codecs
+    - console
+    - control
+    - effect
+    - either
+    - errors
+    - github-actions-toolkit
+    - identity
+    - maybe
+    - node-buffer
+    - node-child-process
+    - node-fs
+    - node-path
+    - node-process
+    - prelude
+    - spec
+    - strings
+    - transformers
+    - yaml-next
+  name: setup-cljstyle
+workspace:
+  extra_packages:
+    errors:
+      git: https://github.com/passy/purescript-errors.git
+      ref: ae4eac76fbf820382656e15cc1c386361ac9405c
+      dependencies:
+        - control
+        - effect
+        - either
+        - identity
+        - maybe
+        - newtype
+        - prelude
+        - transformers
+    github-actions-toolkit:
+      git: https://github.com/purescript-contrib/purescript-github-actions-toolkit.git
+      ref: 1fc2138d66563b51c511e9d6f91ed45eff0d247a
+      dependencies:
+        - aff
+        - aff-promise
+        - control
+        - effect
+        - either
+        - exceptions
+        - foreign-object
+        - maybe
+        - node-buffer
+        - node-path
+        - node-streams
+        - nullable
+        - prelude
+        - transformers
+    yaml-next:
+      git: https://github.com/archaeron/purescript-yaml-next.git
+      ref: cd4833a32458e06ebb4338c3e00f98723c681891
+      dependencies:
+        - argonaut-codecs
+        - argonaut-core
+        - effect
+        - foreign
+        - functions
+        - ordered-collections
+        - unsafe-coerce
+  package_set:
+    url: https://raw.githubusercontent.com/purescript/package-sets/psc-0.15.14-20240105/packages.json

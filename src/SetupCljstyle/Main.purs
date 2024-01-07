@@ -62,6 +62,7 @@ mainReaderT = do
 main :: Effect Unit
 main =
   launchAff_ $ runExceptT $ catchError mainAff' handleError
+
   where
   mainAff' = do
     installer <- case Process.platform of
@@ -72,4 +73,4 @@ main =
       Nothing -> throwError $ SingleError "Failed to identify platform"
     runReaderT mainReaderT { fetcher: textFetcher, installer, rawInputSource }
 
-  handleError msg = liftEffect $ errorShow msg *> Process.exit 1
+  handleError msg = errorShow msg *> Process.exit' 1
